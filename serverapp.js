@@ -9,6 +9,8 @@
  *   with debug :
  *      $ NODE_DEBUG=monax PORT=[number] node serverapp.js
  * 
+ *      TEST git commit on dev1 branch
+ * 
  *******************************************************************************************************/
 
 'use strict';
