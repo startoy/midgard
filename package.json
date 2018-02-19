@@ -1,0 +1,16 @@
+{
+	"name": "library_app",
+	"version": "0.0.1",
+	"main": "serverapp.js",
+	"dependencies": {
+		"@monax/legacy-contracts": "^0.16.8",
+		"@monax/legacy-db": "^0.16.0",
+		"body-parser": "^1.18.2",
+		"express": "^4.16.2",
+		"prompt": "*",
+		"request": "^2.83.0"
+	},
+	"scripts": {
+		"start": "node serverapp.js"
+	}
+}
