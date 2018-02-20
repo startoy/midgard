@@ -33,7 +33,7 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = process.env.PORT
 
-const webIP = "http://10.32.10.52";
+const webIP = "http://159.65.132.186";
 //const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
 const rpcPort = "1337";
 const webURL = webIP + ':' + rpcPort;                                     /* use http endpoint instead of legacy-db */
@@ -100,24 +100,32 @@ app.get('/rpcacc', (request, response) => {
         body :  jsonDataObj,
         json :  true
     };
+    
+    let _error;
+    let _response;
+    let _body;
+
     /* Request to endpoint */
-    requestx.post(options, (error, response, body) => {
-        if (!error && response.statusCode == 200) {
-            let msg = JSON.parse(body);
-            /* if need RAW format remove "JSON.parse" (use chrome extension format) */
+	//console.log(options);
+    var reqq = requestx.post(options, (error, res, body) => {
+	console.log('error:', error);
+        console.log('statusCode:', res && res.statusCode);
+  	console.log('body:', body);
+
+        _error = error;
+	_response = res;
+	_body = body;
+
+            /* body's RAW format (chrone extension handle) */
             /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
-            console.log("requestx = " + msg);
-            return msg;
-        }else{
-            return console.error("failed", error);
-        }
+ 	if (!error && res.statusCode == 200) {
+		response.send(body);
+	}else{
+		console.log("request error", error);
+		response.send(error);
+	}
     });
-
-    setTimeout(function () {
-        console.log("on delay time ", res);
-        response.send(res);
-    }, 500);
-
+    /* end requestx*/
 });
 
 /* END POINT */
