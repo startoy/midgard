@@ -83,37 +83,24 @@ app.get('/transact', (request, response) => {
 });
 
 app.get('/rpcacc', (request, response) => {
-    let request_data = {    
+    /*  let request_data = {    
                             "jsonrpc" : "2.0",
                             "method" : "burrow.getAccounts",
                             "params" : "",
                             "id" : "" 
-                        }; 
-                        /* implement data here */
-                        
-    let res = requestRPC(request_data);
-
-    if(res == false){
-        console.log("RES false ", res);
-    }else{
-        console.log("RES true ", res);
-    }
-
-    setTimeout(function () {
-        console.log("on delay time ", res);
-        response.send(res);
-    }, 500);
-
-});
-
-function requestRPC(data){
-    var jsonDataObj = JSON.stringify(this.data);
+    };  */
+    let jsonDataObj = {
+                            "jsonrpc": "2.0",
+                            "method": "burrow.getAccount",
+                            "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
+    }                    
     var options = {
         headers: {'content-type' : 'application/json'},
         url  :  rpcURL,
         body :  jsonDataObj,
         json :  true
     };
+    /* Request to endpoint */
     requestx.post(options, (error, response, body) => {
         if (!error && response.statusCode == 200) {
             let msg = JSON.parse(body);
@@ -125,7 +112,13 @@ function requestRPC(data){
             return console.error("failed", error);
         }
     });
-}
+
+    setTimeout(function () {
+        console.log("on delay time ", res);
+        response.send(res);
+    }, 500);
+
+});
 
 /* END POINT */
 app.get('/c/:opt', (request, response) => {
