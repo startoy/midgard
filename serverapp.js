@@ -15,16 +15,16 @@
 
 /* Nodejs modules - Blockchain */
 var chainURL = 'http://localhost:1337/rpc';
-var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
+// var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
 //var burrowFactory = require('@monax/legacy-db');                        
 var fs =            require('fs');
 var http =          require('http');
-var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
-var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
-var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
+// var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
+// var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
+// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
 
-var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
-var contract = manager.newContractFactory(abi).at(address);                                
+// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
+// var contract = manager.newContractFactory(abi).at(address);                                
 
 /* Nodejs modules - Server */
 const express = require('express')                                                          /* server provider, easy way to create node server with url handle */
