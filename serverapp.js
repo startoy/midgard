@@ -9,24 +9,22 @@
  *   with debug :
  *      $ NODE_DEBUG=monax PORT=[number] node serverapp.js
  * 
- *      TEST git commit on dev1 branch
- * 
  *******************************************************************************************************/
 
 'use strict';
 
 /* Nodejs modules - Blockchain */
 var chainURL = 'http://localhost:1337/rpc';
-var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
-//var burrowFactory = require('@monax/legacy-db');                        /* in chain */
+// var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
+//var burrowFactory = require('@monax/legacy-db');                        
 var fs =            require('fs');
 var http =          require('http');
-var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
-var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
-var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
+// var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
+// var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
+// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
 
-var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
-var contract = manager.newContractFactory(abi).at(address);                                
+// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
+// var contract = manager.newContractFactory(abi).at(address);                                
 
 /* Nodejs modules - Server */
 const express = require('express')                                                          /* server provider, easy way to create node server with url handle */
@@ -35,10 +33,11 @@ const bodyParser = require('body-parser')
 const app = express()
 const port = process.env.PORT
 
-const webURL = "http://10.32.10.52";
+const webIP = "http://159.65.132.186";
 //const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
 const rpcPort = "1337";
-const rpcURL = webURL + ':' + rpcPort;                                  /* if use http endpoint */
+const webURL = webIP + ':' + rpcPort;                                     /* use http endpoint instead of legacy-db */
+const rpcURL = webURL + '/rpc';
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -58,7 +57,7 @@ app.get('/chain', (request, response) => {
 app.get('/status', (request, response) => {
     console.log("on chains REST api");
     let msg = '';
-    let url = webURL + ':' + rpcPort + '/status';                                           /* expected url = http://188.166.176.43:46657/status */
+    let url = webIP + ':' + rpcPort + '/status';                                           /* expected url = http://188.166.176.43:46657/status */
     requestx(url, function (error, response, body) {
         console.log('error:', error);
         console.log('statusCode:', response && response.statusCode);
@@ -70,12 +69,71 @@ app.get('/status', (request, response) => {
     }, 500);
 });
 
-/* RPC2.0 END POINT */
+/* RPC 2.0 */
+app.get('/transact', (request, response) => {
+    let jsonDataObj = {};
+    let data = ''; /* implement data here */
+    /* let data = {'mes': 'hey dude', 'yo': ['im here', 'and here']}; */
+    let res = requestRPC(data);
+
+    setTimeout(function () {
+        response.send(res);
+    }, 500);
+
+});
+
+app.get('/rpcacc', (request, response) => {
+    /*  let request_data = {    
+                            "jsonrpc" : "2.0",
+                            "method" : "burrow.getAccounts",
+                            "params" : "",
+                            "id" : "" 
+    };  */
+    let jsonDataObj = {
+                            "jsonrpc": "2.0",
+                            "method": "burrow.getAccount",
+                            "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
+    }                    
+    var options = {
+        headers: {'content-type' : 'application/json'},
+        url  :  rpcURL,
+        body :  jsonDataObj,
+        json :  true
+    };
+    
+    let _error;
+    let _response;
+    let _body;
+
+    /* Request to endpoint */
+	//console.log(options);
+    var reqq = requestx.post(options, (error, res, body) => {
+	console.log('error:', error);
+        console.log('statusCode:', res && res.statusCode);
+  	console.log('body:', body);
+
+        _error = error;
+	_response = res;
+	_body = body;
+
+            /* body's RAW format (chrone extension handle) */
+            /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
+ 	if (!error && res.statusCode == 200) {
+		response.send(body);
+	}else{
+		console.log("request error", error);
+		response.send(error);
+	}
+    });
+    /* end requestx*/
+});
+
+/* END POINT */
 app.get('/c/:opt', (request, response) => {
     console.log("on chains end point request for >>> " + request.params.opt);
     let msg = '';
     let opt = request.params.opt;
-    let url = (rpcURL + '/' + opt);                                                         /* expected url = http://188.166.176.43:46657/list_accounts */
+    let url = (webURL + '/' + opt);                                                         /* expected url = http://188.166.176.43:46657/list_accounts */
     console.log('pass1 ' + url)
     requestx(url, function (error, response, body) {
         console.log('error:', error);
@@ -100,7 +158,7 @@ app.get('/s/:opt/:parg1/:arg1/', (request, response) => {
     let opt = request.params.opt
     let parg1 = request.params.parg1
     let arg1 = request.params.arg1
-    let url = (rpcURL + '/' + opt + '?' + parg1 + '=' + arg1);                              /* expected url = http://188.166.176.43:46657/subscribe?eventId=99999 */
+    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1);                              /* expected url = http://188.166.176.43:46657/subscribe?eventId=99999 */
     console.log('req to '+url);
     requestx(url, (error, response, body) => {
         console.log('error:', error);
@@ -122,7 +180,7 @@ app.get('/s/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
     let arg1 = request.params.arg1
     let parg2 = request.params.parg2
     let arg2 = request.params.arg2
-    let url = (rpcURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
+    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
     console.log('req to '+url);
     requestx(url, (error, response, body) => {
         console.log('error:', error);
@@ -146,7 +204,7 @@ app.get('/s/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
     let arg2 = request.params.arg2
     let parg3= request.params.parg3
     let arg3 = request.params.arg3
-    let url = (rpcURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2 + '&' + parg3 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?Address=RSA4221&code=1234%data=IWEOVIG9339 */
+    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2 + '&' + parg3 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?Address=RSA4221&code=1234%data=IWEOVIG9339 */
     console.log('req to '+url);
     requestx(url, (error, response, body) => {
         console.log('error:', error);
@@ -168,7 +226,7 @@ app.get('/s/unsafe/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
     let arg1 = request.params.arg1
     let parg2 = request.params.parg2
     let arg2 = request.params.arg2
-    let url = (rpcURL + '/unsafe/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
+    let url = (webURL + '/unsafe/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
     console.log('req to '+url);
     requestx(url, (error, response, body) => {
         console.log('error:', error);
