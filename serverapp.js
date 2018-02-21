@@ -46,230 +46,126 @@ app.use(bodyParser.urlencoded({
 
 /* default page (send html file to user's request) */
 app.get('/', (request, response) => {
-    response.sendFile('/var/www/html/index.html');
+        response.sendFile('/var/www/html/index.html');
 });
 
 /******************** create case as you wish ***********************/
 app.get('/chain', (request, response) => {
-    response.sendFile('/root/.monax/apps/library/chains.html');
+        response.sendFile('/root/.monax/apps/library/chains.html');
 });
 
 app.get('/status', (request, response) => {
-    console.log("on chains REST api");
-    let msg = '';
-    let url = webIP + ':' + rpcPort + '/status';                                           /* expected url = http://188.166.176.43:46657/status */
-    requestx(url, function (error, response, body) {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-    });
-    setTimeout(function () {
-        response.send(msg);
-    }, 500);
+        console.log("on chains REST api");
+        let msg = '';
+        let url = webIP + ':' + rpcPort + '/status';                                           /* expected url = http://188.166.176.43:46657/status */
+        requestx(url, function (error, response, body) {
+            console.log('error:', error);
+            console.log('statusCode:', response && response.statusCode);
+            console.log('body:', body);
+            msg = body;
+        });
+        setTimeout(function () {
+            response.send(msg);
+        }, 500);
 });
 
-/* RPC 2.0 */
+    /* RPC 2.0 */
 app.get('/transact', (request, response) => {
-    let jsonDataObj = {};
-    let data = ''; /* implement data here */
-    /* let data = {'mes': 'hey dude', 'yo': ['im here', 'and here']}; */
-    let res = requestRPC(data);
-
-    setTimeout(function () {
-        response.send(res);
-    }, 500);
-
+        let jsonDataObj = {};
+        let data = ''; /* implement data here */
+        /* let data = {'mes': 'hey dude', 'yo': ['im here', 'and here']}; */
+        let res = requestRPC(data);
 });
 
 app.get('/rpcacc', (request, response) => {
-    /*  let request_data = {    
-                            "jsonrpc" : "2.0",
-                            "method" : "burrow.getAccounts",
-                            "params" : "",
-                            "id" : "" 
-    };  */
-    let jsonDataObj = {
-                            "jsonrpc": "2.0",
-                            "method": "burrow.getAccount",
-                            "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
-    }                    
-    var options = {
-        headers: {'content-type' : 'application/json'},
-        url  :  rpcURL,
-        body :  jsonDataObj,
-        json :  true
-    };
-    
-    let _error;
-    let _response;
-    let _body;
 
-    /* Request to endpoint */
-	//console.log(options);
-    var reqq = requestx.post(options, (error, res, body) => {
-	console.log('error:', error);
+        let jsonDataObj = {
+                "jsonrpc": "2.0",
+                "method": "burrow.getAccount",
+                "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
+        }                    
+        var options = {
+                headers: {'content-type' : 'application/json'},
+                url  :  rpcURL,
+                body :  jsonDataObj,
+                json :  true
+        };
+        
+        let _error;
+        let _response;
+        let _body;
+
+        /* Request to endpoint */
+        //console.log(options);
+        var reqq = requestx.post(options, (error, res, body) => {
+        console.log('error:', error);
         console.log('statusCode:', res && res.statusCode);
-  	console.log('body:', body);
+        console.log('body:', body);
 
         _error = error;
-	_response = res;
-	_body = body;
+        _response = res;
+        _body = body;
 
-            /* body's RAW format (chrone extension handle) */
-            /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
- 	if (!error && res.statusCode == 200) {
-		response.send(body);
-	}else{
-		console.log("request error", error);
-		response.send(error);
-	}
-    });
-    /* end requestx*/
-});
-
-/* END POINT */
-app.get('/c/:opt', (request, response) => {
-    console.log("on chains end point request for >>> " + request.params.opt);
-    let msg = '';
-    let opt = request.params.opt;
-    let url = (webURL + '/' + opt);                                                         /* expected url = http://188.166.176.43:46657/list_accounts */
-    console.log('pass1 ' + url)
-    requestx(url, function (error, response, body) {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-        console.log('pass2')
-    });
-    console.log('pass3')
-    setTimeout(function () {
-        //console.log("msg:"+ msg );
-        console.log('pass4')
-        response.send(JSON.parse(msg));
-    }, 500);
-    console.log('pass5')
-});
-
-/* Arg = 1 */
-app.get('/s/:opt/:parg1/:arg1/', (request, response) => {
-    console.log('1 argument..')
-    let msg = ''
-    let opt = request.params.opt
-    let parg1 = request.params.parg1
-    let arg1 = request.params.arg1
-    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1);                              /* expected url = http://188.166.176.43:46657/subscribe?eventId=99999 */
-    console.log('req to '+url);
-    requestx(url, (error, response, body) => {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-    })
-    setTimeout(() => {
-        response.send(JSON.parse(msg));
-    }, 500)
-})
-
-/* Arg = 2 */
-app.get('/s/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
-    console.log('2 argument..')
-    let msg = ''
-    let opt = request.params.opt
-    let parg1 = request.params.parg1
-    let arg1 = request.params.arg1
-    let parg2 = request.params.parg2
-    let arg2 = request.params.arg2
-    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
-    console.log('req to '+url);
-    requestx(url, (error, response, body) => {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-    })
-    setTimeout(() => {
-        response.send(JSON.parse(msg));
-    }, 500)
-})
-
-/* Arg = 3 */
-app.get('/s/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
-    console.log('3 argument..')
-    let msg = ''
-    let opt = request.params.opt
-    let parg1 = request.params.parg1
-    let arg1 = request.params.arg1
-    let parg2 = request.params.parg2
-    let arg2 = request.params.arg2
-    let parg3= request.params.parg3
-    let arg3 = request.params.arg3
-    let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2 + '&' + parg3 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?Address=RSA4221&code=1234%data=IWEOVIG9339 */
-    console.log('req to '+url);
-    requestx(url, (error, response, body) => {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-    })
-    setTimeout(() => {
-        response.send(JSON.parse(msg));
-    }, 500)
-})
-
-/* Arg = 2 /unsafe */
-app.get('/s/unsafe/:opt/:parg1/:arg1/:parg2/:arg2', (request, response) => {
-    console.log('2 argument..')
-    let msg = ''
-    let opt = request.params.opt
-    let parg1 = request.params.parg1
-    let arg1 = request.params.arg1
-    let parg2 = request.params.parg2
-    let arg2 = request.params.arg2
-    let url = (webURL + '/unsafe/' + opt + '?' + parg1 + '=' + arg1 + '&' + parg2 + '=' + arg2);     /* expected url = http://188.166.176.43:46657/sign_tx?tx=4213213&privAccounts=4AEOS09237X5129OKKM */
-    console.log('req to '+url);
-    requestx(url, (error, response, body) => {
-        console.log('error:', error);
-        console.log('statusCode:', response && response.statusCode);
-        console.log('body:', body);
-        msg = body;
-    })
-    setTimeout(() => {
-        response.send(JSON.parse(msg));
-    }, 500)
-})
-
-/* Contract -> get */
-app.get('/contracts/get', (request, response) => {
-    console.log("Received request for details.");
-    contract.get(function (error, result) {
-        if (error) {
-            response.statusCode = 500;
-        } else {
-            response.setHeader('Content-Type', 'application/json');
-            response.status(200).send("You have requested details on: " + result);
+        /* send body's RAW format (chrome extension) */
+        /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
+        if (!error && res.statusCode == 200) {
+            response.send(body);
+        }else{
+            console.log("request error", error);
+            response.send(error);
         }
-    });
-});
-
-/* Contract -> put */
-app.put('/contracts/put/:name', (request, response) => {
-    var name = request.params.name;                                                         /* express deprecated req.param(name): Use req.params, req.body, or req.query */
-    console.log("Received request to set title to " + name + '.');
-    request.on('end', function () {
-        contract.set(name, function (error) {
-            response.statusCode = error ? 500 : 200;
-            response.send("Success");
         });
-    });
+        /* end requestx*/
 });
 
+    /* END POINT */
+app.get('/c/:opt', (request, response) => {
+        console.log("on chains end point request for >>> " + request.params.opt);
+        let msg = '';
+        let opt = request.params.opt;
+        let url = (webURL + '/' + opt);                                                         /* expected url = http://188.166.176.43:46657/list_accounts */
+        console.log('pass1 ' + url)
+        requestx(url, function (error, response, body) {
+            console.log('error:', error);
+            console.log('statusCode:', response && response.statusCode);
+            console.log('body:', body);
+            msg = body;
+            console.log('pass2')
+        });
+        console.log('pass3')
+        setTimeout(function () {
+            //console.log("msg:"+ msg );
+            console.log('pass4')
+            response.send(JSON.parse(msg));
+        }, 500);
+        console.log('pass5')
+});
+
+    /* Arg = 1 */
+app.get('/s/:opt/:parg1/:arg1/', (request, response) => {
+        console.log('1 argument..')
+        let msg = ''
+        let opt = request.params.opt
+        let parg1 = request.params.parg1
+        let arg1 = request.params.arg1
+        let url = (webURL + '/' + opt + '?' + parg1 + '=' + arg1);                              /* expected url = http://188.166.176.43:46657/subscribe?eventId=99999 */
+        console.log('req to '+url);
+        requestx(url, (error, response, body) => {
+            console.log('error:', error);
+            console.log('statusCode:', response && response.statusCode);
+            console.log('body:', body);
+            msg = body;
+        })
+        setTimeout(() => {
+            response.send(JSON.parse(msg));
+        }, 500)
+});
 
 /* start express server with port... */
 app.listen(port, (err) => {
-    if (err) {
-        return console.log('Fail to intial server:', err);
-    } else {
-        console.log('server is listening on port' + port);
-    }
+        if (err) {
+            return console.log('Fail to intial server:', err);
+        } else {
+            console.log('server' + webIP + 'is listening on port' + port);
+        }
 });
