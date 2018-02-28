@@ -5,10 +5,10 @@
  * 
  * blockchain : choose endpoint/legacydb
  * how to run :
- *      $ PORT=[number] node serverapp.js
+ *      $ PORT=[number] node serverapp.js (or nodemon)
  *   with debug :
  *      $ NODE_DEBUG=monax PORT=[number] node serverapp.js
- * 
+ *
  *******************************************************************************************************/
 
 'use strict';
@@ -40,6 +40,8 @@ const webIP = "http://159.65.132.186";
 const rpcPort = "1337";
 const webURL = webIP + ':' + rpcPort;                                     /* use http endpoint instead of legacy-db */
 const rpcURL = webURL + '/rpc';
+const keyURL = webIP + ':' + '4767' ;
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -97,9 +99,51 @@ app.get('/rpcacc', (request, response) => {
         let _response;
         let _body;
 
-        /* Request to endpoint */
+        
         //console.log(options);
+        /* Requestx */
         var reqq = requestx.post(options, (error, res, body) => {
+            console.log('error:', error);
+            console.log('statusCode:', res && res.statusCode);
+            console.log('body:', body);
+
+            _error = error;
+            _response = res;
+            _body = body;
+
+            /* send body with RAW format (chrome extension) */
+            if (!error && res.statusCode == 200) {
+                response.send(body);
+            }else{
+                console.log("request error", error);
+                response.send(error);
+            }
+        });
+        /* end requestx*/
+});
+
+app.get('/genkey', (request, response) => {
+
+    let jsonDataObj = {
+            "jsonrpc": "2.0",
+            "method": "burrow.getAccount",
+            "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
+    }                    
+    var options = {
+            headers: {'content-type' : 'application/json'},
+            url  :  rpcURL,
+            body :  jsonDataObj,
+            json :  true
+    };
+    
+    let _error;
+    let _response;
+    let _body;
+
+    
+    //console.log(options);
+    /* Requestx */
+    var reqq = requestx.post(options, (error, res, body) => {
         console.log('error:', error);
         console.log('statusCode:', res && res.statusCode);
         console.log('body:', body);
@@ -108,16 +152,15 @@ app.get('/rpcacc', (request, response) => {
         _response = res;
         _body = body;
 
-        /* send body's RAW format (chrome extension) */
-        /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
+        /* send body with RAW format (chrome extension) */
         if (!error && res.statusCode == 200) {
             response.send(body);
         }else{
             console.log("request error", error);
             response.send(error);
         }
-        });
-        /* end requestx*/
+    });
+    /* end requestx*/
 });
 
     /* END POINT */
