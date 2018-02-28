@@ -14,27 +14,29 @@
 'use strict';
 
 /* Nodejs modules - Blockchain */
-var chainURL = 'http://localhost:1337/rpc';
+//var chainURL = 'http://localhost:1337/rpc';
 // var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
 //var burrowFactory = require('@monax/legacy-db');                        
 var fs =            require('fs');
 var http =          require('http');
 // var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
 // var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
-// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
+// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) -> for 'Private Keys and Signing' */
 
-// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
-// var contract = manager.newContractFactory(abi).at(address);                                
+    /* use an accountData object (address & private key) directly but no key/signing daemon is needed, DEV ONLY */
+// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);
+// var contract = manager.newContractFactory(abi).at(address);                  /* point to smart contract that's on the chain */                  
 
 /* Nodejs modules - Server */
 const express = require('express')                                                          /* server provider, easy way to create node server with url handle */
 const requestx = require('request')                                                         /* make a http request to specific url */
 const bodyParser = require('body-parser')
-const app = express()
-const port = process.env.PORT
 
+const app = express()
+
+const port = process.env.PORT
 const webIP = "http://159.65.132.186";
-//const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
+    //const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
 const rpcPort = "1337";
 const webURL = webIP + ':' + rpcPort;                                     /* use http endpoint instead of legacy-db */
 const rpcURL = webURL + '/rpc';
