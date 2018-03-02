@@ -5,39 +5,43 @@
  * 
  * blockchain : choose endpoint/legacydb
  * how to run :
- *      $ PORT=[number] node serverapp.js
+ *      $ PORT=[number] node serverapp.js (or nodemon)
  *   with debug :
  *      $ NODE_DEBUG=monax PORT=[number] node serverapp.js
- * 
+ *
  *******************************************************************************************************/
 
 'use strict';
 
 /* Nodejs modules - Blockchain */
-var chainURL = 'http://localhost:1337/rpc';
+//var chainURL = 'http://localhost:1337/rpc';
 // var contracts =     require('@monax/legacy-contracts');                 /* my DEAR smart contract */
 //var burrowFactory = require('@monax/legacy-db');                        
 var fs =            require('fs');
 var http =          require('http');
 // var address =       require('./epm.output.json').deployStorageK;        /* get address of (compiled)smart contract */
 // var abi = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));      /* parse */
-// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) */
+// var accounts =      require('../../chains/multichain/accounts.json');   /* ONLY USE .json (should be an object) -> for 'Private Keys and Signing' */
 
-// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);   /* my account */
-// var contract = manager.newContractFactory(abi).at(address);                                
+    /* use an accountData object (address & private key) directly but no key/signing daemon is needed, DEV ONLY */
+// var manager = contracts.newContractManagerDev(chainURL, accounts.library_chain_full_000);
+// var contract = manager.newContractFactory(abi).at(address);                  /* point to smart contract that's on the chain */                  
 
 /* Nodejs modules - Server */
 const express = require('express')                                                          /* server provider, easy way to create node server with url handle */
 const requestx = require('request')                                                         /* make a http request to specific url */
 const bodyParser = require('body-parser')
-const app = express()
-const port = process.env.PORT
 
+const app = express()
+
+const port = process.env.PORT
 const webIP = "http://159.65.132.186";
-//const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
+    //const rpcPort = "46657";                                                /* 46657 for tendermint, 1337 for burrow (have doc) */
 const rpcPort = "1337";
 const webURL = webIP + ':' + rpcPort;                                     /* use http endpoint instead of legacy-db */
 const rpcURL = webURL + '/rpc';
+const keyURL = webIP + ':' + '4767' ;
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -95,9 +99,51 @@ app.get('/rpcacc', (request, response) => {
         let _response;
         let _body;
 
-        /* Request to endpoint */
+        
         //console.log(options);
+        /* Requestx */
         var reqq = requestx.post(options, (error, res, body) => {
+            console.log('error:', error);
+            console.log('statusCode:', res && res.statusCode);
+            console.log('body:', body);
+
+            _error = error;
+            _response = res;
+            _body = body;
+
+            /* send body with RAW format (chrome extension) */
+            if (!error && res.statusCode == 200) {
+                response.send(body);
+            }else{
+                console.log("request error", error);
+                response.send(error);
+            }
+        });
+        /* end requestx*/
+});
+
+app.get('/genkey', (request, response) => {
+
+    let jsonDataObj = {
+            "jsonrpc": "2.0",
+            "method": "burrow.getAccount",
+            "params" : { "address" : "60EB2790441106175D5823A821C429E919D6A5DA" }
+    }                    
+    var options = {
+            headers: {'content-type' : 'application/json'},
+            url  :  rpcURL,
+            body :  jsonDataObj,
+            json :  true
+    };
+    
+    let _error;
+    let _response;
+    let _body;
+
+    
+    //console.log(options);
+    /* Requestx */
+    var reqq = requestx.post(options, (error, res, body) => {
         console.log('error:', error);
         console.log('statusCode:', res && res.statusCode);
         console.log('body:', body);
@@ -106,16 +152,15 @@ app.get('/rpcacc', (request, response) => {
         _response = res;
         _body = body;
 
-        /* send body's RAW format (chrome extension) */
-        /* if parse access by ->  msg.param1, msg.param2, msg[5],param1 */
+        /* send body with RAW format (chrome extension) */
         if (!error && res.statusCode == 200) {
             response.send(body);
         }else{
             console.log("request error", error);
             response.send(error);
         }
-        });
-        /* end requestx*/
+    });
+    /* end requestx*/
 });
 
     /* END POINT */
