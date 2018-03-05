@@ -83,7 +83,7 @@ app.get('/end', (request, response) => {
         console.log("request method >> " + method);
         let jsonDataObj = {
                 "jsonrpc": "2.0",
-                "method": method;
+                "method": method
         }                    
         var options = {
                 headers: {'content-type' : 'application/json'},
