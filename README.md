@@ -27,10 +27,6 @@ GUIDE :
       *       pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
       *       local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
 
-                *      Pipe.addAccount(accountData) Add to the list of available accounts
-                *      Pipe.removeAccount(accountId)
-                *      Pipe.setDefaultAccount(accountId) default from account
-
   4. Create contract factory 
   
           // Create a factory (or contract template) from 'myJsonAbi'
@@ -42,7 +38,7 @@ GUIDE :
           var address = "...";
           var myContract myContractFactory.at(address);
 
-          ย่อ 4. 5. => var myContract = contractManager.newContractFactory(abi).at(address);
+       *ย่อ 4. 5. => var myContract = contractManager.newContractFactory(abi).at(address);
 
   6. USE !!
   
@@ -53,10 +49,13 @@ GUIDE :
 Pipe ใช้งานผ่าน
 
     myContract.pipes
+            *      Pipe.addAccount(accountData) Add to the list of available accounts
+            *      Pipe.removeAccount(accountId)
+            *      Pipe.setDefaultAccount(accountId) default from account
 
 
 
-X* Create a new instance, Deploy the contract onto the chain
+* Create a new instance, Deploy the contract onto the chain
 
           var myContract;
           var myCode = "...";
@@ -94,17 +93,19 @@ X** Create a new instance, contract already exist on the chain
 
 
 // GET /search?q=tobi+ferret
-req.query.q
-// => "tobi ferret"
+
+      req.query.q
+      // => "tobi ferret"
 
 // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
-req.query.order     
-// => "desc"
 
-req.query.shoe.color
-// => "blue"
+      *     req.query.order     
+      // => "desc"
 
-req.query.shoe.type
-// => "converse"
+      *     req.query.shoe.color
+      // => "blue"
+
+      *     req.query.shoe.type
+      // => "converse"
 
 
