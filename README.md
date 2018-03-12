@@ -1,20 +1,22 @@
 GUIDE :
 
-      var burrowURL = "http://localhost:1337/rpc";
-      var contracts =     require('@monax/legacy-contracts');
+          var burrowURL = "http://localhost:1337/rpc";
+          var contracts =     require('@monax/legacy-contracts');
 
   1. Declare ABI file
     
           contractABI = "./smart.abi"; // PATH TO ABI FILE
           ABI = fs.readJSONSync(contractABI);
+          
           // ที่ใช้อยู่เพื่อจะได้ไม่ต้องแก้ไฟล์ เวลา deploy smart contract ใหม่
-                  var address = require('./epm.output.json').deployStorageK;
-                  var ABI = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
+             *    var address = require('./epm.output.json').deployStorageK;
+             *    var ABI = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 
   2. Declare account
     
           // var accountPath = "/.monax/chains/multichain/account.json";
           // var account = fs.readJSONSync(accountPath);
+          
           var accountData = require('/some/account/data.json');
 
   3. Create contract manager
@@ -30,6 +32,7 @@ GUIDE :
   4. Create contract factory 
   
           // Create a factory (or contract template) from 'myJsonAbi'
+          
           var myContractFactory = contractManager.newContractFactory(myJsonAbi);
           var myOtherContractFactory = contractManager.newContractFactory(myOtherJsonAbi);
 
@@ -45,13 +48,12 @@ GUIDE :
           myContract.add(34, 22, addCallback);
 
 
-
 Pipe ใช้งานผ่าน
 
-    myContract.pipes
-            *      Pipe.addAccount(accountData) Add to the list of available accounts
-            *      Pipe.removeAccount(accountId)
-            *      Pipe.setDefaultAccount(accountId) default from account
+          myContract.pipes
+            Pipe.addAccount(accountData) Add to the list of available accounts
+            Pipe.removeAccount(accountId)
+            Pipe.setDefaultAccount(accountId) default from account
 
 
 
@@ -99,13 +101,13 @@ X** Create a new instance, contract already exist on the chain
 
 // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
 
-      *     req.query.order     
+      req.query.order     
       // => "desc"
 
-      *     req.query.shoe.color
+      req.query.shoe.color
       // => "blue"
 
-      *     req.query.shoe.type
+      req.query.shoe.type
       // => "converse"
 
 
