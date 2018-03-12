@@ -18,10 +18,10 @@ GUIDE :
   3. Create contract manager
           var contractManager = contracts.newContractManagerDev(burrowURL, accountData);
 
-    * newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  https://github.com/monax/legacy-contracts.js
-    * account เป็น constructor มี address, pubKey, privKey (string)
-    * pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
-    * local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
+    *       newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  https://github.com/monax/legacy-contracts.js
+    *       account เป็น constructor มี address, pubKey, privKey (string)
+    *       pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
+    *       local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
     *      Pipe.addAccount(accountData) Add to the list of available accounts
     *      Pipe.removeAccount(accountId)
     *      Pipe.setDefaultAccount(accountId) default from account
