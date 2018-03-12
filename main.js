@@ -1,8 +1,8 @@
         /* require package */
 const fs         = require('fs-extra');
-const monax      = require('@monax/legacy-contracts');
-const express    = require('express')                                                          /* server provider, easy way to create node server with url handle */
-const requestx   = require('request')                                                         /* make a http request to specific url */
+const contracts      = require('@monax/legacy-contracts');
+const express    = require('express')                          /* server provider, easy way to create node server with url handle */
+const requestx   = require('request')                          /* make a http request to specific url */
 const bodyParser = require('body-parser')
 
         /* variable */
@@ -10,10 +10,10 @@ burrowURL        = "http://0.0.0.0:1337";
 burrowrpcURL     = "http://0.0.0.0:1337/rpc"
 keysURL          = "http://0.0.0.0:4767";
         /* smart contract */
-var address = require('./epm.output.json').deployStorageK;
+var address = require('./epm.output.json').deploySmart;
 var ABI = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
-var accountData = require('/.monax/chains/multichain/account.json');
-var contractManager = contracts.newContractManagerDev(burrowURL, accountData);
+var accountData = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
+var contractManager = contracts.newContractManagerDev(burrowURL, accountData.multichain_full_000);
 var myContract = contractManager.newContractFactory(ABI).at(address);
 
         /* express js */
@@ -35,13 +35,29 @@ app.get('/', (request, response) => {
 
 
 app.get('/test', (request, response) => {
+        //always include callback
         myContract.getInts((error, res) => {
+                let result = error;
                 console.log("Res Str = " + res.toString());
                 console.log("Res = " + res);
-                let result = error;
                 if (!error && res.statusCode == 200) {
                         result = res;    
                 }
+                console.log("Result " + result);
+                response.send(result);
+              });
+});
+
+app.get('/testset', (request, response) => {
+        //always include callback
+        myContract.setAddress("0000000000000000000000000000000000000000",(error, res) => {
+                let result = error;
+                console.log("Res Str = " + res.toString());
+                console.log("Res = " + res);
+                if (!error && res.statusCode == 200) {
+                        result = res;    
+                }
+                console.log("Result " + result);
                 response.send(result);
               });
 });
