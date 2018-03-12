@@ -1,9 +1,8 @@
 GUIDE :
 
       var burrowURL = "http://localhost:1337/rpc";
-      var contracts =     require('@monax/legacy-contracts'); 
-      
-    *มี contracts.pipe
+      var contracts =     require('@monax/legacy-contracts');
+            *มี contracts.pipe
 
   1. Declare ABI file
     
@@ -23,14 +22,15 @@ GUIDE :
   
               var contractManager = contracts.newContractManagerDev(burrowURL, accountData);
 
-          *       newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  
-                     ( see: https://github.com/monax/legacy-contracts.js )
-          *       account เป็น constructor มี address, pubKey, privKey (string)
-          *       pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
-          *       local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
-          *      Pipe.addAccount(accountData) Add to the list of available accounts
-          *      Pipe.removeAccount(accountId)
-          *      Pipe.setDefaultAccount(accountId) default from account
+*       newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  
+         ( see: https://github.com/monax/legacy-contracts.js )
+*       account เป็น constructor มี address, pubKey, privKey (string)
+*       pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
+*       local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
+
+                *      Pipe.addAccount(accountData) Add to the list of available accounts
+                *      Pipe.removeAccount(accountId)
+                *      Pipe.setDefaultAccount(accountId) default from account
 
   4. Create contract factory 
   
@@ -49,9 +49,13 @@ GUIDE :
   
           myContract.add(34, 22, addCallback);
 
+
+
 Pipe ใช้งานผ่าน
 
     myContract.pipes
+
+
 
 X* Create a new instance, Deploy the contract onto the chain
 
@@ -73,6 +77,7 @@ X** Create a new instance, contract already exist on the chain
   // can omit the callback, no check is made see (5.)
 
 ** JavaScript syntax *
+
 -- Tradition JS callback
 
     myContract.add(34, 22, addCallback);
@@ -90,17 +95,17 @@ X** Create a new instance, contract already exist on the chain
 
 
 // GET /search?q=tobi+ferret
-    req.query.q
+req.query.q
 // => "tobi ferret"
 
 // GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
-    req.query.order
+req.query.order     
 // => "desc"
 
-    req.query.shoe.color
+req.query.shoe.color
 // => "blue"
 
-    req.query.shoe.type
+req.query.shoe.type
 // => "converse"
 
 
