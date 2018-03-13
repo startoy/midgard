@@ -13,7 +13,7 @@ keysURL          = "http://0.0.0.0:4767";
 var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
-var contractManager     = contracts.newContractManagerDev(burrowURL, accountData.multichain_full_000);
+var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 var myContract          = contractManager.newContractFactory(ABI).at(address);
 
         /* express js */
@@ -49,7 +49,7 @@ app.get('/test', (request, response) => {
 
 app.get('/testset', (request, response) => {
         //always include callback
-        myContract.setAddress("0000000000000000000000000000000000000000",(error, res) => {
+        myContract.setAddress("0000000000000000000000000000000000009999",(error, res) => {
                 let result = error;
                 console.log("Res Str = " + res.toString());
                 console.log("Res = " + res);
