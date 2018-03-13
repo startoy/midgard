@@ -1,4 +1,4 @@
-GUIDE :
+
 
           var burrowURL = "http://localhost:1337/rpc";
           var contracts =     require('@monax/legacy-contracts');
@@ -8,8 +8,9 @@ GUIDE :
           contractABI = "./smart.abi"; // PATH TO ABI FILE
           ABI = fs.readJSONSync(contractABI);
           
-          // ที่ใช้อยู่เพื่อจะได้ไม่ต้องแก้ไฟล์ เวลา deploy smart contract ใหม่
-             *    var address = require('./epm.output.json').deployStorageK;
+       // ที่ใช้อยู่เพื่อจะได้ไม่ต้องแก้ไฟล์ เวลา deploy smart contract ใหม่
+
+             *    var address = require('./epm.output.json').deploySmart;
              *    var ABI = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 
   2. Declare account
