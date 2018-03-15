@@ -22,8 +22,9 @@
 
   3. Create contract manager
   
-              var contractManager = contracts.newContractManagerDev(burrowURL, accountData);
+              var contractManager = contracts.newContractManagerDev(burrowRPCURL, accountData);
 
+      *       ถ้าจะใช้ smart contract URL ต้อง /rpc !!
       *       newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  
                ( see: https://github.com/monax/legacy-contracts.js )
       *       account เป็น constructor มี address, pubKey, privKey (string)
@@ -40,7 +41,7 @@
   5. Create contract (X*, X**)
   
           var address = "...";
-          var myContract myContractFactory.at(address);
+          var myContract = myContractFactory.at(address);
 
        *ย่อ 4. 5. => var myContract = contractManager.newContractFactory(abi).at(address);
 
