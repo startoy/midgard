@@ -1,5 +1,5 @@
 {
-	"name": "Monax-Com",
+	"name": "MonaxCom",
 	"version": "01.03.18",
 	"main": "serverapp.js",
 	"dependencies": {
