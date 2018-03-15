@@ -1,6 +1,6 @@
 {
-	"name": "library_app",
-	"version": "0.0.1",
+	"name": "Monax-Com",
+	"version": "01.03.18",
 	"main": "serverapp.js",
 	"dependencies": {
 		"@monax/legacy-contracts": "^0.16.8",
@@ -11,6 +11,6 @@
 		"request": "^2.83.0"
 	},
 	"scripts": {
-		"start": "node serverapp.js"
+		"start": "nodemon main.js"
 	}
 }
