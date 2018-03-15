@@ -14,15 +14,14 @@ var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
 
-	/* if SHORTEN -> but can't use pipe account */
+        /* if SHORTEN -> but can't use pipe account */
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
-
-	/* FULL (newContractManagerDev)  */
+        /* else FULL (newContractManagerDev) */
 var burrowModule = require("@monax/legacy-db");
 var burrow = burrowModule.createInstance("http://localhost:1337/rpc");
 var pipe = new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
 var contractManager = contracts.newContractManager(pipe);
-
+        /* end if */
 var myContract          = contractManager.newContractFactory(ABI).at(address);
 
         /* express js */
@@ -54,7 +53,6 @@ app.get('/test', (request, response) => {
               });
 });
 
-
 /*  
  accountData <object>
  accountAddress <string>
@@ -62,7 +60,6 @@ app.get('/test', (request, response) => {
  <- TO USE ->
  pipe = contracts.pipes.Devpipe(burrow,accountData);
  let Result = pipe.addAccount();
-
 
 DevPipe.prototype.addAccount = function (accountData)
 DevPipe.prototype.removeAccount = function (accountAddress)
@@ -72,16 +69,12 @@ DevPipe.prototype.hasAccount = function (accountAddress)
 DevPipe.prototype.transact = function (txPayload, callback)
 DevPipe.prototype.call = function (txPayload, callback)
 
-
  // CUstom Function
-
 DevPipe.prototype.listAccount = function (){
         return this._accountData
 }
 
-
 */
-
 	/* generate a new account and return as a obj */
 app.get('/genacc', (request, response) => {
 	/* Requestx */
@@ -191,20 +184,12 @@ app.get('/rpc', (request, response) => {
                 json: true
         };
         
-        let _error;
-        let _response;
-        let _body;
-        
         console.log(options);
         /* Requestx */
         let reqq = requestx.post(options, (error, res, body) => {
             console.log('error:', error);
             console.log('statusCode:', res && res.statusCode);
             console.log('body:', body);
-    
-            _error = error;
-            _response = res;
-            _body = body;
     
             /* send body with RAW format (chrome extension) */
             if (!error && res.statusCode == 200) {
@@ -225,20 +210,12 @@ app.get('/url', (request, response) => {
                 url: burrowURL + '/' + method
         };
 
-        let _error;
-        let _response;
-        let _body;
-
         console.log(options);
         /* Requestx */
         let reqq = requestx.get(options, (error, res, body) => {
             console.log('error:', error);
             console.log('statusCode:', res && res.statusCode);
             console.log('body:', body);
-
-            _error = error;
-            _response = res;
-            _body = body;
 
             /* send body with RAW format (chrome extension) */
             if (!error && res.statusCode == 200) {
