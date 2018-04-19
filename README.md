@@ -1,6 +1,7 @@
  Config
- 1. เอา temp/dev_pipe.js ไปวางที่ /monax-ui/node_modules/@monax/legacy-contracts/lib/pipes$
- 2. รันเซิฟเวอร์ ใช้คำสั่ง $PORT=8080 node main.js
+  1. เอา temp/dev_pipe.js ไปวางที่ /monax-ui/node_modules/@monax/legacy-contracts/lib/pipes$
+  2. สร้าง monax blockchain, กำหนดค่า path ต่างๆ ในไฟล์ main.js
+  3. รันเซิฟเวอร์ ใช้คำสั่ง $PORT=8080 node main.js
 
 *see main.js along with..
 
