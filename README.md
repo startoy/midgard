@@ -25,44 +25,61 @@
 
   3. Create contract manager
   
+              // shorten declaration
               var contractManager = contracts.newContractManagerDev(burrowRPCURL, accountData);
+              
+              // full declaration
+              var burrowModule = require("@monax/legacy-db");
+              var burrow = burrowModule.createInstance("http://localhost:1337/rpc");
+              var pipe = new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
+              var contractManager = contracts.newContractManager(pipe);
 
-      *       ถ้าจะใช้ smart contract URL ต้อง /rpc !!
-      *       newContractManagerDev คือ มี pipe (pipe มี burrow, account) เข้ามาแล้ว  
-               ( see: https://github.com/monax/legacy-contracts.js )
-      *       account เป็น constructor มี address, pubKey, privKey (string)
-      *       pipe ต่อ legacy-contract กับ burrow js API ใช้ signing transaction มี DevPipe กับ LocalSignerPipe
-      *       local signing ยังไม่มี ! ใช้ Devpipe ส่ง privKey พร้อมกับ Transaction ไปที่ Server (ทำให้)
+      *       ถ้าจะใช้ฟังก์ชันใน smart contract, URL ต้องใช้ตัว url ที่มี /rpc !! 
+      *       ( see: https://github.com/monax/legacy-contracts.js )
+      *       account ที่ใช้เป็น constructor ประกอบด้วย address, pubKey, privKey (string)
+      *       pipe ต่อ legacy-contract กับ burrow js API ใช้ในการ signing transaction, มี sign 2 แบบ DevPipe กับ LocalSignerPipe
+      *       แต่ localsigning ยังไม่มี! ให้ใช้แบบ Devpipe แทน ซึ่งจะส่ง privKey พร้อมกับ Transaction ไปที่ Server (ให้ server sign)
 
   4. Create contract factory 
   
           // Create a factory (or contract template) from 'myJsonAbi'
           
           var myContractFactory = contractManager.newContractFactory(myJsonAbi);
+          
+          //ถ้ามี contract ตัวอื่นด้วย
           var myOtherContractFactory = contractManager.newContractFactory(myOtherJsonAbi);
 
   5. Create contract (X*, X**)
   
           var address = "...";
           var myContract = myContractFactory.at(address);
+          
+          //ถ้ามี contract ตัวอื่นด้วย
+          var myOtherContract = myOtherContractFactory.
 
-       *ย่อ 4. 5. ใช้ => var myContract = contractManager.newContractFactory(abi).at(address);
+       *ถ้าย่อ 4. 5. ใช้ => 
+       
+          var myContract = contractManager.newContractFactory(abi).at(address);
 
   6. USE !!
   
           myContract.add(34, 22, addCallback);
 
+--------------------------------------------- note ----------------------------------------------
 
-Pipe ใช้งานผ่าน
+Pipe ใช้งาน
 
           myContract.pipes
             Pipe.addAccount(accountData) Add to the list of available accounts
             Pipe.removeAccount(accountId)
             Pipe.setDefaultAccount(accountId) default from account
+            
+            ex.  pipe = contracts.pipes.Devpipe(burrow,accountData);
+                 let Result = pipe.addAccount();
 
 
 
-* Create a new instance, Deploy the contract onto the chain
+X* Create a new instance, Deploy the contract onto the chain
 
           var myContract;
           var myCode = "...";
