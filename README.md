@@ -1,24 +1,27 @@
 
+*see main.js along with..
 
           var burrowURL = "http://localhost:1337/rpc";
           var contracts =     require('@monax/legacy-contracts');
 
   1. Declare ABI file
     
+          // ที่ใช้อยู่เพื่อจะได้ไม่ต้องแก้ไฟล์ เวลา deploy smart contract ใหม่
           contractABI = "./smart.abi"; // PATH TO ABI FILE
           ABI = fs.readJSONSync(contractABI);
           
-       // ที่ใช้อยู่เพื่อจะได้ไม่ต้องแก้ไฟล์ เวลา deploy smart contract ใหม่
-
+         
+             // อันเดิม
              *    var address = require('./epm.output.json').deploySmart;
              *    var ABI = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 
+
   2. Declare account
-    
+  
           // var accountPath = "/.monax/chains/multichain/account.json";
           // var account = fs.readJSONSync(accountPath);
-          
           var accountData = require('/some/account/data.json');
+
 
   3. Create contract manager
   
@@ -43,7 +46,7 @@
           var address = "...";
           var myContract = myContractFactory.at(address);
 
-       *ย่อ 4. 5. => var myContract = contractManager.newContractFactory(abi).at(address);
+       *ย่อ 4. 5. ใช้ => var myContract = contractManager.newContractFactory(abi).at(address);
 
   6. USE !!
   
@@ -80,7 +83,7 @@ X** Create a new instance, contract already exist on the chain
 
 ** JavaScript syntax *
 
--- Tradition JS callback
+-- Write as Traditional Javascrpipt asyn
 
     myContract.add(34, 22, addCallback);
 
@@ -88,13 +91,16 @@ X** Create a new instance, contract already exist on the chain
       console.log(sum.toString()); // Would print: 56
     }
 
--- ES6 (ES2015) JS callback
+-- Write as ES6 (ES2015) Javascrpipt asyn
 
     myContract.add(34, 22, (error, sum) => {
       console.log(sum.toString()); // Would print: 56
     });
 
 
+
+
+การเรียก/ส่งสตริงผ่านบราวเซอร์
 
 // GET /search?q=tobi+ferret
 
