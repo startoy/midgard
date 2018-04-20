@@ -9,22 +9,24 @@ const bodyParser        = require('body-parser')
 burrowURL        = "http://0.0.0.0:1337";
 burrowrpcURL     = "http://0.0.0.0:1337/rpc"
 keysURL          = "http://0.0.0.0:4767";
+
         /* smart contract */
 var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
 
-        /* if SHORTEN -> but can't use pipe account */
+        /* SHORT (ใช้ devpipe ไม่ได้) */
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
-        /* else FULL (newContractManagerDev) */
+
+        /* FULL (ใช้ DevPipe) */
 var burrowModule = require("@monax/legacy-db");
 var burrow = burrowModule.createInstance("http://localhost:1337/rpc");
 var pipe = new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
 var contractManager = contracts.newContractManager(pipe);
-        /* end if */
+
 var myContract          = contractManager.newContractFactory(ABI).at(address);
 
-        /* express js */
+        /* expressjs */
 const app       = express();
 const port      = process.env.PORT;
 
@@ -36,11 +38,14 @@ app.use(bodyParser.urlencoded({
 /* default page*/
 app.get('/', (request, response) => {
         response.send('<h1>Hello !!</h1><br>')
-        // response.send(new Buffer('WoofWoof'))
-        // response.send({ some : "json" });
-        // response.send(404, 'SOrry, Can\'t find that');
+
+/*       response.send(new Buffer('WoofWoof'))          //send as new Buffer
+         response.send({ some : "json" });              //send as new json
+         response.send(404, 'SOrry, Can\'t find that'); //send with statuscode and msg
+*/
 });
 
+/* FOR TEST ACCOUNT */
 app.get('/test', (request, response) => {
         //always include callback
 	let result;
@@ -53,28 +58,18 @@ app.get('/test', (request, response) => {
               });
 });
 
-/*  
- accountData <object>
- accountAddress <string>
+app.get('/test2', (request, response) => {
+        //always include callback
+	let result;
+        myContract.getUInts((error, res) => {
+                if (!error) {
+                        result = res;    
+                }else{ result = error; }
+                console.log("Result " + result);
+                response.send(result.toString());
+              });
+});
 
- <- TO USE ->
- pipe = contracts.pipes.Devpipe(burrow,accountData);
- let Result = pipe.addAccount();
-
-DevPipe.prototype.addAccount = function (accountData)
-DevPipe.prototype.removeAccount = function (accountAddress)
-DevPipe.prototype.setDefaultAccount = function (accountAddress)      
-DevPipe.prototype.hasAccount = function (accountAddress)
-
-DevPipe.prototype.transact = function (txPayload, callback)
-DevPipe.prototype.call = function (txPayload, callback)
-
- // CUstom Function
-DevPipe.prototype.listAccount = function (){
-        return this._accountData
-}
-
-*/
 	/* generate a new account and return as a obj */
 app.get('/genacc', (request, response) => {
 	/* Requestx */
@@ -143,6 +138,13 @@ app.get('/setacc', (request, response) => {
 	response.send(res);
 });
 
+app.get('/setaccback', (request,response) => {
+        let account = request.query.account;
+        let res = pipe.setDefaultAccount(account);
+        console.log(res);
+        response.send(res);
+})
+
 app.get('/testset', (request, response) => {
         //always include callback
 	let result;
@@ -151,23 +153,11 @@ app.get('/testset', (request, response) => {
                         result = res;    
                 }else{ result = error; }
                 console.log("Result " + result);
-                response.send("is have result => " + result);
+                response.send("Result => " + result);
               });
 });
 
-app.get('/testconstant', (request, response) => {
-	let result;
-	myContract.getInts( (error, res)=>{
-		if(!error){
-			result = res;
-		}else{ result = error}
-		console.log("Result " + result);
-		response.send("Result = " + result);
-	});
-});
-
 app.get('/rpc', (request, response) => {
-        // only use req.query for convenient dev
         let method = 'burrow.' + request.query.method;
         console.log("request method >> " + method);
         let address = request.query.addr;
@@ -175,6 +165,7 @@ app.get('/rpc', (request, response) => {
                 "jsonrpc": "2.0",
                 "method": method
         }
+
         let options = {
                 headers: {
                         'content-type': 'application/json'
@@ -185,6 +176,7 @@ app.get('/rpc', (request, response) => {
         };
         
         console.log(options);
+
         /* Requestx */
         let reqq = requestx.post(options, (error, res, body) => {
             console.log('error:', error);
@@ -211,6 +203,7 @@ app.get('/url', (request, response) => {
         };
 
         console.log(options);
+        
         /* Requestx */
         let reqq = requestx.get(options, (error, res, body) => {
             console.log('error:', error);
@@ -227,22 +220,6 @@ app.get('/url', (request, response) => {
         });
         /* end requestx*/
 });
-
-/* 
-// GET /search?q=tobi+ferret
-req.query.q
-// => "tobi ferret"
-
-// GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
-req.query.order
-// => "desc"
-
-req.query.shoe.color
-// => "blue"
-
-req.query.shoe.type
-// => "converse"
- */
 
 app.listen(port, (err) => {
         if (err) {

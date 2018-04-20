@@ -1,7 +1,7 @@
  Config
-  1. เอา temp/dev_pipe.js ไปวางที่ /monax-ui/node_modules/@monax/legacy-contracts/lib/pipes$
+  1. เอา temp/dev_pipe.js ไปวางที่ /node_modules/@monax/legacy-contracts/lib/pipes/...
   2. สร้าง monax blockchain, deploy smart contract
-  3. กำหนดค่า path ต่างๆ ในไฟล์ main.js ให้ถูกต้อง
+  3. กำหนดค่า path ต่างๆ ในไฟล์ main.js ให้ชี้ถูกต้อง
   3. รันเซิฟเวอร์ ใช้คำสั่ง $PORT=8080 node main.js
 
 *see main.js along with..
@@ -72,15 +72,30 @@
 
 --------------------------------------------- note ----------------------------------------------
 
-Pipe ใช้งาน
 
-          myContract.pipes
-            Pipe.addAccount(accountData) Add to the list of available accounts
-            Pipe.removeAccount(accountId)
-            Pipe.setDefaultAccount(accountId) default from account
-            
-            ex.  pipe = contracts.pipes.Devpipe(burrow,accountData);
-                 let Result = pipe.addAccount();
+
+ ฟอร์แมต
+          accountData <object>
+          accountAddress <string>
+
+          <- TO USE ->
+          pipe = contracts.pipes.Devpipe(burrow,accountData);
+          let Result = pipe.addAccount();
+
+          ฟังก์ชันที่ใช้ได้
+          DevPipe.prototype.addAccount = function (accountData)
+          DevPipe.prototype.removeAccount = function (accountAddress)
+          DevPipe.prototype.setDefaultAccount = function (accountAddress)      
+          DevPipe.prototype.hasAccount = function (accountAddress)
+
+          DevPipe.prototype.transact = function (txPayload, callback)
+          DevPipe.prototype.call = function (txPayload, callback)
+
+          // Custom Function
+          DevPipe.prototype.listAccount = function (){
+                  return this._accountData
+          }
+
 
 
 
@@ -118,8 +133,6 @@ X** Create a new instance, contract already exist on the chain
     myContract.add(34, 22, (error, sum) => {
       console.log(sum.toString()); // Would print: 56
     });
-
-
 
 
 การเรียก/ส่งสตริงผ่านบราวเซอร์
