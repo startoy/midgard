@@ -14,7 +14,7 @@ var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
 
-	/* if SHORTEN -> but can't use pipe account */
+        /* SHORT (ใช้ devpipe ไม่ได้) */
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
 	/* FULL (newContractManagerDev)  */
@@ -37,11 +37,14 @@ app.use(bodyParser.urlencoded({
 /* default page*/
 app.get('/', (request, response) => {
         response.send('<h1>Hello !!</h1><br>')
-        // response.send(new Buffer('WoofWoof'))
-        // response.send({ some : "json" });
-        // response.send(404, 'SOrry, Can\'t find that');
+
+/*       response.send(new Buffer('WoofWoof'))          //send as new Buffer
+         response.send({ some : "json" });              //send as new json
+         response.send(404, 'SOrry, Can\'t find that'); //send with statuscode and msg
+*/
 });
 
+/* FOR TEST ACCOUNT */
 app.get('/test', (request, response) => {
         //always include callback
 	let result;
@@ -54,34 +57,6 @@ app.get('/test', (request, response) => {
               });
 });
 
-
-
-/*  
- accountData <object>
- accountAddress <string>
-
- <- TO USE ->
- pipe = contracts.pipes.Devpipe(burrow,accountData);
- let Result = pipe.addAccount();
-
-
-DevPipe.prototype.addAccount = function (accountData)
-DevPipe.prototype.removeAccount = function (accountAddress)
-DevPipe.prototype.setDefaultAccount = function (accountAddress)      
-DevPipe.prototype.hasAccount = function (accountAddress)
-
-DevPipe.prototype.transact = function (txPayload, callback)
-DevPipe.prototype.call = function (txPayload, callback)
-
-
- // CUstom Function
-
-DevPipe.prototype.listAccount = function (){
-        return this._accountData
-}
-
-
-*/
 
 	/* generate a new account and return as a obj */
 app.get('/genacc', (request, response) => {
@@ -204,6 +179,13 @@ app.get('/setdefacc', (request, response) => {
         response.send(res);
 });
 
+app.get('/setaccback', (request,response) => {
+        let account = request.query.account;
+        let res = pipe.setDefaultAccount(account);
+        console.log(res);
+        response.send(res);
+})
+
 app.get('/testset', (request, response) => {
         //always include callback
 	let result;
@@ -212,7 +194,7 @@ app.get('/testset', (request, response) => {
                         result = res;    
                 }else{ result = error; }
                 console.log("Result " + result);
-                response.send("is have result => " + result);
+                response.send("Result => " + result);
               });
 });
 
@@ -264,8 +246,7 @@ app.get('/test3', (request, response) => {
 });
 
 
-app.post('/rpc', (request, response) => {
-        // only use req.query for convenient dev
+app.get('/rpc', (request, response) => {
         let method = 'burrow.' + request.query.method;
         console.log("request method >> " + method);
         let address = request.query.addr;
@@ -273,6 +254,7 @@ app.post('/rpc', (request, response) => {
                 "jsonrpc": "2.0",
                 "method": method
         }
+
         let options = {
                 headers: {
                         'content-type': 'application/json'
@@ -282,20 +264,13 @@ app.post('/rpc', (request, response) => {
                 json: true
         };
         
-        let _error;
-        let _response;
-        let _body;
-        
         console.log(options);
+
         /* Requestx */
         let reqq = requestx.post(options, (error, res, body) => {
             console.log('error:', error);
             console.log('statusCode:', res && res.statusCode);
             console.log('body:', body);
-    
-            _error = error;
-            _response = res;
-            _body = body;
     
             /* send body with RAW format (chrome extension) */
             if (!error && res.statusCode == 200) {
@@ -316,20 +291,13 @@ app.get('/url', (request, response) => {
                 url: burrowURL + '/' + method
         };
 
-        let _error;
-        let _response;
-        let _body;
-
         console.log(options);
+        
         /* Requestx */
         let reqq = requestx.get(options, (error, res, body) => {
             console.log('error:', error);
             console.log('statusCode:', res && res.statusCode);
             console.log('body:', body);
-
-            _error = error;
-            _response = res;
-            _body = body;
 
             /* send body with RAW format (chrome extension) */
             if (!error && res.statusCode == 200) {
@@ -341,22 +309,6 @@ app.get('/url', (request, response) => {
         });
         /* end requestx*/
 });
-
-/* 
-// GET /search?q=tobi+ferret
-req.query.q
-// => "tobi ferret"
-
-// GET /shoes?order=desc&shoe[color]=blue&shoe[type]=converse
-req.query.order
-// => "desc"
-
-req.query.shoe.color
-// => "blue"
-
-req.query.shoe.type
-// => "converse"
- */
 
 app.listen(port, (err) => {
         if (err) {
