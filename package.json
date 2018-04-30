@@ -1,7 +1,7 @@
 {
-	"name": "library_app",
-	"version": "0.0.1",
-	"main": "serverapp.js",
+	"name": "monax-ui",
+	"version": "1.0.18",
+	"main": "main.js",
 	"dependencies": {
 		"@monax/legacy-contracts": "^0.16.8",
 		"@monax/legacy-db": "^0.16.0",
@@ -11,6 +11,6 @@
 		"request": "^2.83.0"
 	},
 	"scripts": {
-		"start": "node serverapp.js"
+		"start": "main.js"
 	}
 }

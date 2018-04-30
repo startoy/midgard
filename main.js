@@ -1,14 +1,14 @@
         /* require package */
-const fs                = require('fs-extra');
+const fs		= require('fs');
 const contracts         = require('@monax/legacy-contracts');
 const express           = require('express')                          /* server provider, easy way to create node server with url handle */
 const requestx          = require('request')                          /* make a http request to specific url */
 const bodyParser        = require('body-parser')
 
         /* variable */
-burrowURL        = "http://0.0.0.0:1337";
-burrowrpcURL     = "http://0.0.0.0:1337/rpc"
-keysURL          = "http://0.0.0.0:4767";
+burrowURL        	= "http://0.0.0.0:1337";
+burrowrpcURL     	= "http://0.0.0.0:1337/rpc"
+keysURL          	= "http://0.0.0.0:4767";
         /* smart contract */
 var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
@@ -18,16 +18,16 @@ var accountData         = require('/home/ubuntu/.monax/chains/multichain/account
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
 	/* FULL (newContractManagerDev)  */
-var burrowModule = require("@monax/legacy-db");
-var burrow = burrowModule.createInstance("http://localhost:1337/rpc");
-var pipe = new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
-var contractManager = contracts.newContractManager(pipe);
+var burrowModule 	= require("@monax/legacy-db");
+var burrow 		= burrowModule.createInstance("http://localhost:1337/rpc");
+var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
+var contractManager 	= contracts.newContractManager(pipe);
 
 var myContract          = contractManager.newContractFactory(ABI).at(address);
 
         /* express js */
-const app       = express();
-const port      = process.env.PORT;
+const app       	= express();
+const port      	= process.env.PORT;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -53,6 +53,7 @@ app.get('/test', (request, response) => {
                 response.send(result.toString());
               });
 });
+
 
 
 /*  
@@ -105,6 +106,7 @@ app.get('/genacc', (request, response) => {
         		pubKey : pub,
         		privKey : pri
 		}
+		console.log("sending... " + newDataObj);
 		response.send(newDataObj);
             }else{
 
@@ -122,6 +124,56 @@ app.get('/addacc', (request, response) => {
 	let res = pipe.addAccount(acc);
 		console.log(res);
 		response.send(res);
+});
+
+app.get('/addacc2', (request, response) => {
+	let addr = request.query.address; 
+	let pubk = request.query.pub;
+	let prik = request.query.pri;
+
+        let acc = {
+                address : addr, 
+                pubKey : pubk,
+                privKey : prik };
+        let res = pipe.addAccount(acc);
+                console.log(res);
+                response.send(res);
+});
+
+
+app.get('/genandadd', (request, response) => {
+ 	let options = {
+                url: 'http://0.0.0.0:8080' + '/genacc'
+        };
+        let reqq = requestx.get(options, (error, res, body) => {
+
+            if (!error && res.statusCode == 200) {
+
+                let obj     = JSON.parse(body);
+                var address = obj.address;
+                var pub     = obj.pubKey;
+                var pri     = obj.privKey;
+
+		options = { url : 'http://0.0.0.0:8080' + '/addacc2?address=' + address + '&pub=' + pub + '&pri=' + pri};
+		
+		console.log("response gen account ->" + JSON.stringify(options));
+		let req2 = requestx.get(options, (error2, res2, body2) => {
+			if (!error2 && res2.statusCode == 200) {
+				console.log("send !");
+				response.send(body2 + "\nwith address = " + obj.address);
+			}else{
+				console.log("error !" + error2);
+				response.send(error2);
+			}		
+		});
+            }else{
+
+                console.log("request error", error);
+                response.send(error);
+            }
+        });
+
+	
 });
 
 
@@ -144,10 +196,12 @@ app.get('/hasacc', (request, response) => {
 	response.send(res);
 });
 
-app.get('/setacc', (request, response) => {
-	let res = pipe.setDefaultAccount("B7BBBAA281CC4062894E5D8F16D8C59D35537F09");
-	console.log(res);
-	response.send(res);
+
+app.get('/setdefacc', (request, response) => {
+	let address = request.query.address;
+        let res = pipe.setDefaultAccount(address);
+        console.log(res);
+        response.send(res);
 });
 
 app.get('/testset', (request, response) => {
@@ -173,7 +227,44 @@ app.get('/testconstant', (request, response) => {
 	});
 });
 
-app.get('/rpc', (request, response) => {
+
+app.get('/test2', (request, response) => {
+	let address = request.query.address;
+	let x = request.query.x;
+	let result;
+	console.log("is test 2");
+	myContract.getUints.call( x ,{from : address}, (error, res)=>{
+		if(!error){
+			result = res;
+		}else{
+			result = error;
+		}
+		console.log("test2 ->" + result);
+		response.send("test2 ->" + result);
+	});
+});
+
+app.get('/test3', (request, response) => {
+        let address = request.query.address;
+        let id = request.query.id;
+        let name = request.query.name;
+        let amount = request.query.amount;
+        let price = request.query.price;
+        let result;
+        console.log("is test 2");
+        myContract.add_stock( id, name, amount, price, {from : address}, (error, res)=>{
+                if(!error){
+                        result = res;
+                }else{
+                        result = error;
+                }
+                console.log("test2 ->" + result);
+                response.send("test2 ->" + result);
+        });
+});
+
+
+app.post('/rpc', (request, response) => {
         // only use req.query for convenient dev
         let method = 'burrow.' + request.query.method;
         console.log("request method >> " + method);
