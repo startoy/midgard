@@ -1,6 +1,7 @@
         /* require package */
 const fs		= require('fs');
 const contracts         = require('@monax/legacy-contracts');
+const burrowModule      = require('@monax/legacy-db');
 const express           = require('express')                          /* server provider, easy way to create node server with url handle */
 const requestx          = require('request')                          /* make a http request to specific url */
 const bodyParser        = require('body-parser')
@@ -18,8 +19,7 @@ var accountData         = require('/home/ubuntu/.monax/chains/multichain/account
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
 	/* FULL (newContractManagerDev)  */
-var burrowModule 	= require("@monax/legacy-db");
-var burrow 		= burrowModule.createInstance("http://localhost:1337/rpc");
+var burrow 		= burrowModule.createInstance(burrowrpcURL);
 var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
 var contractManager 	= contracts.newContractManager(pipe);
 
@@ -93,9 +93,9 @@ app.get('/genacc', (request, response) => {
 
 app.get('/addacc', (request, response) => {
 	let acc = {
-		address : "B7BBBAA281CC4062894E5D8F16D8C59D35537F09",
-		pubKey : "F5EAB8DEC2CB84AE3841BEDE7CFC3BA9701D4D02A847DA1FD9E8466A50D0DC18",
-		privKey : "5A0F2ABE788DD507C7AED82A673689A47FEB589F27DD6922AC03F8C0BB35E32FF5EAB8DEC2CB84AE3841BEDE7CFC3BA9701D4D02A847DA1FD9E8466A50D0DC18"};
+		address : "AAA3AC34CE13B2307FB3F6048E9F27D697EEB1A3",
+		pubKey : "E66621B1ACD210CD6567A19CA64A4D934CEE8EE336F8909183C62BDC2E70510E",
+		privKey : "7E805EE897AE58D36E830F389E146F3E967ABA0C863CA5561E3654CB345FAF92E66621B1ACD210CD6567A19CA64A4D934CEE8EE336F8909183C62BDC2E70510E"};
 	let res = pipe.addAccount(acc);
 		console.log(res);
 		response.send(res);
@@ -179,6 +179,18 @@ app.get('/setdefacc', (request, response) => {
         response.send(res);
 });
 
+app.get('/send', (request, response) => {
+	let privkey = request.query.privkey;
+        let address = request.query.address;
+        let tx = burrow.txs();
+ 	tx.sendAndHold(privkey, address, 150, sendTokenCallback() );
+	response.send("the server is working on token command... The Result will come later, You can quit this page.");
+});
+
+function sendTokenCallback(){
+	console.log("Sending Token... ");
+}
+
 app.get('/setaccback', (request,response) => {
         let account = request.query.account;
         let res = pipe.setDefaultAccount(account);
@@ -233,7 +245,7 @@ app.get('/test3', (request, response) => {
         let amount = request.query.amount;
         let price = request.query.price;
         let result;
-        console.log("is test 2");
+        console.log("is test 333");
         myContract.add_stock( id, name, amount, price, {from : address}, (error, res)=>{
                 if(!error){
                         result = res;
@@ -249,17 +261,16 @@ app.get('/test3', (request, response) => {
 app.get('/rpc', (request, response) => {
         let method = 'burrow.' + request.query.method;
         console.log("request method >> " + method);
-        let address = request.query.addr;
         let jsonDataObj = {
                 "jsonrpc": "2.0",
-                "method": method
+                "method": method,
         }
 
         let options = {
                 headers: {
                         'content-type': 'application/json'
                 },
-                url: burrowURL,
+                url: burrowrpcURL,
                 body: jsonDataObj,
                 json: true
         };
@@ -283,6 +294,9 @@ app.get('/rpc', (request, response) => {
         /* end requestx*/
 });
 
+/* ex. 
+http://13.229.109.182/url?method=accounts/F1DE4090E06ED638B7C8E4AF90C5B8DF37931896/storage 
+*/
 app.get('/url', (request, response) => {
         let method = request.query.method;
         console.log("request web method >> " + method);
@@ -308,6 +322,54 @@ app.get('/url', (request, response) => {
             }
         });
         /* end requestx*/
+});
+
+/* same as do as on smart contract if you know the data byte */
+app.post('/post/tx', (request, response) => {
+	let priv_key = request.body.priv_key;
+	let data = request.body.data;
+	let address = request.body.address;
+	let fee = request.body.fee;
+	let gas_limit = request.body.gas_limit;
+
+	let jsonDataObj = {
+                "jsonrpc": "2.0",
+                "method": "burrow.transactAndHold",
+                "params" : {
+			"priv_key": priv_key,
+			"data":      data,
+			"address":   address,
+			"fee":       1,
+			"gas_limit": 20000 
+                           }
+        }
+
+        let options = {
+                headers: {
+                        'content-type': 'application/json'
+                },
+                url: burrowrpcURL,
+                body: jsonDataObj,
+                json: true
+        };
+/* Requestx */
+        let reqq = requestx.post(options, (error, res, body) => {
+
+            console.log('error:', error);
+            console.log('statusCode:', res && res.statusCode);
+            console.log('body:', body);
+
+
+            /* send body with RAW format (chrome extension) */
+            if (!error && res.statusCode == 200) {
+                response.send("response : "+ JSON.stringify(body));
+            }else{
+                console.log("request error : ", error);
+                response.send(error);
+            }
+        });
+/* end requestx*/
+	
 });
 
 app.listen(port, (err) => {

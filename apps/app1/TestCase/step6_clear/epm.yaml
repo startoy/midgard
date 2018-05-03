@@ -1,0 +1,56 @@
+jobs:
+
+- name: deploySmart
+  set:
+      val: 61ED0117AF183005AE68792C5304EDD73163D1E7
+      
+- name: setAddr1
+  set:
+      val: 11
+
+- name: setAddr2
+  set:
+      val: 22
+
+- name: setAddr3
+  set:
+      val: 33
+
+- name: setAddr4
+  set:
+      val: 44
+
+- name: setAddr5
+  set:
+      val: 55
+
+- name: Pin_Clear
+  call:
+      destination: $deploySmart
+      function: clearData
+      data: [$setAddr1]
+
+- name: Sun_Clear
+  call:
+      destination: $deploySmart
+      function: clearData
+      data: [$setAddr2]
+
+- name: Beer_Clear
+  call:
+      destination: $deploySmart
+      function: clearData
+      data: [$setAddr3]
+
+- name: Mek_Clear
+  call:
+      destination: $deploySmart
+      function: clearData
+      data: [$setAddr4]
+
+- name: TO_Clear
+  call:
+      destination: $deploySmart
+      function: clearData
+      data: [$setAddr5]
+

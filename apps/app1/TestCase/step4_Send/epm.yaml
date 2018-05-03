@@ -1,0 +1,92 @@
+jobs:
+
+- name: setAddr1
+  set:
+      val: 11
+
+- name: setAddr2
+  set:
+      val: 22
+
+- name: setAddr3
+  set:
+      val: 33
+
+- name: setAddr4
+  set:
+      val: 44
+
+- name: setAddr5
+  set:
+      val: 55
+
+- name: deploySmart
+  set:
+      val: 61ED0117AF183005AE68792C5304EDD73163D1E7
+
+- name: Pin_Send_Sun
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr1,$setAddr2]
+
+- name: Pin_Send_Beer
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr1,$setAddr3]
+
+- name: Pin_Send_Mek
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr1,$setAddr4]
+
+- name: Sun_Send_Pin
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr2,$setAddr1]
+
+- name: Sun_Send_Mek
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr2,$setAddr4]
+
+- name: Beer_Send_Mek
+  call:
+      destination: $deploySmart
+      function: giving
+      data: [$setAddr3,$setAddr4]
+
+- name: queryPIN
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr1]
+
+- name: querySUN
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr2]
+
+- name: queryBEER
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr3]
+
+- name: queryMEK
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr4]
+
+- name: queryTO
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr5]
+

@@ -1,0 +1,104 @@
+jobs:
+
+- name: setAddr1
+  set:
+      val: 11
+
+- name: setAddr2
+  set:
+      val: 22
+
+- name: setAddr3
+  set:
+      val: 33
+
+- name: setAddr4
+  set:
+      val: 44
+
+- name: setAddr5
+  set:
+      val: 55
+
+- name: deploySmart
+  set:
+      val: 61ED0117AF183005AE68792C5304EDD73163D1E7
+
+- name: queryEmp1
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr1]
+
+- name: queryEmp2 
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee 
+      data: [$setAddr2]
+
+- name: queryEmp3
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr3]
+
+- name: queryEmp4
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr4]
+
+- name: queryEmp5
+  query-contract:
+      destination: $deploySmart
+      function: getEmployee
+      data: [$setAddr5]
+
+- name: queryStockList
+  call:
+      destination: $deploySmart
+      function: getStockList
+      data:
+
+- name: countEmployee
+  call:
+      destination: $deploySmart
+      function: countEmployees 
+      data:
+
+- name: countStock
+  call:
+      destination: $deploySmart
+      function: countStocks
+      data:
+
+
+- name: PIN_Redeem
+  call:
+      destination: $deploySmart
+      function: getEmployeeRedeem
+      data: [$setAddr1]
+
+- name: SUN_Redeem
+  call:
+      destination: $deploySmart
+      function: getEmployeeRedeem
+      data: [$setAddr2]
+
+- name: SUN_Redeem
+  call:
+      destination: $deploySmart
+      function: getEmployeeRedeem
+      data: [$setAddr3]
+
+- name: MEK_Redeem
+  call:
+      destination: $deploySmart
+      function: getEmployeeRedeem
+      data: [$setAddr4]
+
+- name: TO_Redeem
+  call:
+      destination: $deploySmart
+      function: getEmployeeRedeem
+      data: [$setAddr5]
