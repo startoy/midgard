@@ -1,4 +1,0 @@
-- name: deploySmart
-  deploy:
-      contract: smart.sol
-
