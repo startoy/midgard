@@ -1,27 +1,19 @@
 {
-  "name": "monax-com",
-  "version": "1.3.18",
-  "main": "serverapp.js",
-  "dependencies": {
-    "@monax/legacy-contracts": "^0.16.8",
-    "@monax/legacy-db": "^0.16.0",
-    "body-parser": "^1.18.2",
-    "express": "^4.16.2",
-    "prompt": "*",
-    "request": "^2.83.0"
-  },
-  "scripts": {
-    "start": "nodemon main.js"
-  },
-  "description": "Config\r   1. เอา temp/dev_pipe.js ไปวางที่ /node_modules/@monax/legacy-contracts/lib/pipes/...\r   2. สร้าง monax blockchain, deploy smart contract\r   3. กำหนดค่า path ต่างๆ ในไฟล์ main.js ให้ชี้ถูกต้อง\r   3. รันเซิฟเวอร์ ใช้คำสั่ง $PORT=8080 node main.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/startoy/monax-ui.git"
-  },
-  "author": "Peerapat S",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/startoy/monax-ui/issues"
-  },
-  "homepage": "https://github.com/startoy/monax-ui#readme"
+	"name": "monax-ui",
+	"version": "1.0.18",
+	"main": "main.js",
+	"dependencies": {
+		"@monax/legacy-contracts": "^0.16.8",
+		"@monax/legacy-db": "^0.16.0",
+		"body-parser": "^1.18.2",
+		"express": "^4.16.2",
+		"prompt": "*",
+		"request": "^2.83.0"
+	},
+	"scripts": {
+		"start": "PORT=8080 NODE_DEBUG=monax nodemon index.js --ignore 'apps/'"
+	},
+	"devDependencies": {
+		"eslint-config-google": "^0.9.1"
+	}
 }

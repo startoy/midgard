@@ -1,0 +1,9 @@
+jobs:
+
+- name: queryPerm
+  query-account:
+      account: 4BC13A7F24A260B3BCA3F078975CBB2F7932B572 
+      field: permissions.base
+
+
+
