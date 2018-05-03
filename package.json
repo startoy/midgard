@@ -11,6 +11,6 @@
 		"request": "^2.83.0"
 	},
 	"scripts": {
-		"start": "main.js"
+		"start": "PORT=8080 NODE_DEBUG=monax nodemon main.js --ignore 'apps/'"
 	}
 }

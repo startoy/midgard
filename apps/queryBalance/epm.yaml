@@ -1,0 +1,8 @@
+jobs:
+
+- name: queryBalance
+  query-account:
+      account: CC0C417132B7CD185196237E0B8E8F4F734AF336
+      field: balance
+
+

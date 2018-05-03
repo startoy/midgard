@@ -1,0 +1,13 @@
+jobs:
+
+- name: queryBonded
+  job:
+    query-vals:
+      field: bonded_validators
+
+- name: queryUnbonding
+  job:
+    query-vals:
+      field: unbonding_validators
+
+

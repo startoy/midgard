@@ -1,0 +1,36 @@
+jobs:
+- name: account
+  set:
+      val: AAA3AC34CE13B2307FB3F6048E9F27D697EEB1A3
+
+- name: sendToken 
+  send:
+      destination: $account 
+      amount: 100
+
+- name: queryBalance
+  query-account:
+      account: $account
+      field: balance
+
+- name: permCall
+  permission:
+      action: setBase
+      target: $account
+      permission: call
+      value: "true"
+
+- name: permSend
+  permission:
+      action: setBase
+      target: $account
+      permission: send
+      value: "true"
+
+
+- name: queryPerm
+  query-account:
+      account: $account
+      field: permissions.base
+
+
