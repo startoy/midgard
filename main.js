@@ -10,7 +10,8 @@ const bodyParser        = require('body-parser')
 burrowURL        	= "http://0.0.0.0:1337";
 burrowrpcURL     	= "http://0.0.0.0:1337/rpc"
 keysURL          	= "http://0.0.0.0:4767";
-        /* smart contract */
+
+        /* read config file */
 var address             = require('./epm.output.json').deploySmart;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
@@ -28,20 +29,22 @@ var myContract          = contractManager.newContractFactory(ABI).at(address);
         /* express js */
 const app       	= express();
 const port      	= process.env.PORT;
-
+        /* for .post request */
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
 
-/* default page*/
-app.get('/', (request, response) => {
-        response.send('<h1>Hello !!</h1><br>')
+/* Module - TEST */
+// TODO:
+import mymodule from 'module';
+mymodule.convert();
 
-/*       response.send(new Buffer('WoofWoof'))          //send as new Buffer
-         response.send({ some : "json" });              //send as new json
-         response.send(404, 'SOrry, Can\'t find that'); //send with statuscode and msg
-*/
+
+// FIXME:
+/* default api */
+app.get('/', (request, response) => {
+        response.send('<div align="center"><h1>THIS IS BLOCKCHAIN API</h1></div><br>')
 });
 
 /* FOR TEST ACCOUNT */
@@ -81,11 +84,8 @@ app.get('/genacc', (request, response) => {
         		pubKey : pub,
         		privKey : pri
 		}
-		console.log("sending... " + newDataObj);
 		response.send(newDataObj);
             }else{
-
-                console.log("request error", error);
 		response.send(error);
             }
         });
@@ -130,8 +130,6 @@ app.get('/genandadd', (request, response) => {
                 var pri     = obj.privKey;
 
 		options = { url : 'http://0.0.0.0:8080' + '/addacc2?address=' + address + '&pub=' + pub + '&pri=' + pri};
-		
-		console.log("response gen account ->" + JSON.stringify(options));
 		let req2 = requestx.get(options, (error2, res2, body2) => {
 			if (!error2 && res2.statusCode == 200) {
 				console.log("send !");
@@ -142,7 +140,6 @@ app.get('/genandadd', (request, response) => {
 			}		
 		});
             }else{
-
                 console.log("request error", error);
                 response.send(error);
             }
@@ -379,3 +376,11 @@ app.listen(port, (err) => {
                 console.log('server' + ' is listening on port ' + port);
         }
 });
+
+
+/* 
+return res.status(403).send({ 
+			success: false, 
+			message: 'No token provided.'
+		});
+*/
