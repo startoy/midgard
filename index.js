@@ -52,7 +52,7 @@ var tx      = express.Router();
         });
 
         account.get('/', (req, res) => {
-                res.json({ message : "this is first page of api go -> /acc or /tx"});
+                res.json({ message : "this is first page of api"});
         });
 
 
