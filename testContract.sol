@@ -1,41 +1,40 @@
 pragma solidity ^ 0.4.4;
 contract TestContract {
 
-	uint[] public stock_list;
-	mapping (uint => Stock) stocks;
+    uint[] public stock_list;
+    mapping (uint => Stock) stocks;
+    address public testAddress;
 
-address public testAddress;
-
-	struct Stock {
+    struct Stock {
 		uint    id;
 		string 	name;	
- 		uint 	amount;
+		uint 	amount;
 		uint 	price;
+    }
+
+	event AddressSet(bool indexed itWasSet);
+
+	function getInts() constant returns (int a, int b) {
+		a = -10;
+		b = -50;
+		AddressSet(false);
 	}
 
-    event AddressSet(bool indexed itWasSet);
+	function getUints(uint x) constant  returns (uint a, uint b) {
+		a = 10 + x;
+		b = 50;
+		AddressSet(false);
+	}
 
-    function getInts() constant returns (int a, int b) {
-        a = -10;
-        b = -50;
-        AddressSet(false);
-    }
-    
-    function getUints(uint x) constant  returns (uint a, uint b) {
-        a = 10 + x;
-        b = 50;
-        AddressSet(false);
-    }
-    
-    function setAddress(address addressIn) external {
-        testAddress = addressIn;
-        AddressSet(true);
-    }
-    
+	function setAddress(address addressIn) external {
+		testAddress = addressIn;
+		AddressSet(true);
+	}
+
 	function add_stock(uint _id,string _name,uint _amount,uint _price)  returns (uint)
 	{
-	   if(equal(stocks[_id].name,""))
-	   {
+		if(equal(stocks[_id].name,""))
+		{
 			var stock = stocks[_id];
 			stock.id   = _id;
 			stock.name = _name;
@@ -44,31 +43,38 @@ address public testAddress;
 
 			stock_list.push(_id) -1;
 			return 1;
-	   }
-	   return 0;
+		}
+		return 0;
 	}
 
 	function compare(string _a, string _b) returns (int) {
-        	bytes memory a = bytes(_a);
-        	bytes memory b = bytes(_b);
-        	uint minLength = a.length;
-        	if (b.length < minLength) minLength = b.length;
-        	//@todo unroll the loop into increments of 32 and do full 32 byte comparisons
-        	for (uint i = 0; i < minLength; i ++)
-            		if (a[i] < b[i])
-                		return -1;
-            		else if (a[i] > b[i])
-                		return 1;
-        	if (a.length < b.length)
-            		return -1;
-       	 	else if (a.length > b.length)
-            		return 1;
-        	else
-            		return 0;
-    	}
+		bytes memory a = bytes(_a);
+		bytes memory b = bytes(_b);
+		uint minLength = a.length;
+		if (b.length < minLength) minLength = b.length;
+		//@todo unroll the loop into increments of 32 and do full 32 byte comparisons
+		for (uint i = 0; i < minLength; i ++)
+		if (a[i] < b[i])
+			return -1;
+		else if (a[i] > b[i])
+			return 1;
+		if (a.length < b.length)
+			return -1;
+		else if (a.length > b.length)
+			return 1;
+		else
+			return 0;
+	}
 
-    	function equal(string _a, string _b) returns (bool) {
-        	return compare(_a, _b) == 0;
-    	}
+	function equal(string _a, string _b) returns (bool) {
+		return compare(_a, _b) == 0;
+	}
+
+	function contractTime_test() returns (uint now_time, uint onspot_time, uint redeem_time)
+	{
+		now_time 	= now;
+		onspot_time = onspotEnd;
+		redeem_time = redeemEnd;
+	}
 
 }

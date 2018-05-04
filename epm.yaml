@@ -1,5 +1,5 @@
 jobs:
 
-- name: deploySmart
+- name: deployNewSmartContract
   deploy:
       contract: testContract.sol 

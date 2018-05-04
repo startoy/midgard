@@ -1,0 +1,22 @@
+// CONFIG
+Onspot
+contractTime_test
+adjust_activityTime
+
+// STOCK
+add_stock
+delete_stock
+getStockList
+adjust_stock
+countStocks
+
+// EMPLOYEE
+create_employee
+give_onspot
+redeem_gift
+getHistory
+getEmployeeRedeem
+getEmployeeRedeem_count
+getEmployee
+countEmployees
+clearData
