@@ -20,7 +20,7 @@ var accountData         = require('/home/ubuntu/.monax/chains/multichain/account
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
         /* FULL (newContractManagerDev)  */
-var burrow 		= burrowModule.createInstance(burrowrpcURL);
+var burrow 		= burrowModule.createInstance(_burrowrpcURL);
 var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
 var contractManager 	= contracts.newContractManager(pipe);
 
@@ -52,7 +52,7 @@ var tx      = express.Router();
         });
 
         account.get('/', (req, res) => {
-                res.json({ message : "this is first page of api go -> /acc or /tx"});
+                res.json({ message : "this is first page of api go"});
         });
 
 
@@ -67,9 +67,9 @@ var tx      = express.Router();
                 .post((req, res) => {
                         //call create account
                         let options = { url : _url_acc + '/generate' };
-                        request.get(options, (err, res, body) => {
-                                if(!err && this.res.statusCode == 200) {
-                                        if(addAccount(this.res)){
+                        request.get(options, (err, res2, body) => {
+                                if(!err && res2.statusCode == 200) {
+                                        if(addAccount(res2)){
                                                 console.log("success add account");
                                                 res.json({ message : "success", status : 1});
                                         }else{
@@ -86,8 +86,8 @@ var tx      = express.Router();
         account.route('/generate')
                 .get((req, res) => {
                         let options = { url: _burrowURL + '/' + 'unsafe/pa_generator'};
-                        request.get(options, (error , res, body) => {
-                            if (!error && this.res.statusCode == 200) {
+                        request.get(options, (error , res2, body) => {
+                            if (!error && res2.statusCode == 200) {
                                 let obj     = JSON.parse(body);
                                 var address = obj.address;
                                 var pub     = obj.pub_key[1];
