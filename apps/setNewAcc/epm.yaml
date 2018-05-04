@@ -1,7 +1,7 @@
 jobs:
 - name: account
   set:
-      val: AAA3AC34CE13B2307FB3F6048E9F27D697EEB1A3
+      val: C09E56B1BE34AB5E8CF22011F8F2A6BB2141C5EA
 
 - name: sendToken 
   send:
@@ -26,6 +26,14 @@ jobs:
       target: $account
       permission: send
       value: "true"
+
+- name: permSend
+  permission:
+      action: setBase
+      target: $account
+      permission: root
+      value: "true"
+
 
 
 - name: queryPerm

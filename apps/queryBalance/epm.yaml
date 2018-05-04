@@ -2,7 +2,11 @@ jobs:
 
 - name: queryBalance
   query-account:
-      account: CC0C417132B7CD185196237E0B8E8F4F734AF336
+      account: 326441B7D0FC68759343CE4ED2F0A86D31F9BFBB
       field: balance
 
+- name: queryNodeBalance
+  query-account:
+      account: 0A37949103BDA9F2249BB3BFAF4D7F3D8421AEEE
+      field: balance
 

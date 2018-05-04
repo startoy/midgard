@@ -11,7 +11,7 @@
 		"request": "^2.83.0"
 	},
 	"scripts": {
-		"start": "PORT=8080 NODE_DEBUG=monax nodemon index.js --ignore 'apps/'"
+		"start": "PORT=8080 NODE_DEBUG=monax nodemon apiserver.js --ignore 'apps/'"
 	},
 	"devDependencies": {
 		"eslint-config-google": "^0.9.1",

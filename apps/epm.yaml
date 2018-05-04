@@ -1,0 +1,9 @@
+jobs:
+- name: account
+  set:
+      val: 7857A43C1813D68B33391E014DC5D339A6F8C404
+
+- name: sendToken
+  send:
+      destination: $account
+      amount: 100

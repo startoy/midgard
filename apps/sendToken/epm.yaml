@@ -1,0 +1,15 @@
+jobs:
+- name: account
+  set:
+      val: D2E645D512465B6EE7F7098AD923AA65642AA6C4
+
+- name: sendToken
+  send:
+      destination: $account
+      amount: 100
+
+- name: queryBalance
+  query-account:
+      account: $account
+      field: balance
+
