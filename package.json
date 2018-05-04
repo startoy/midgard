@@ -14,6 +14,7 @@
 		"start": "PORT=8080 NODE_DEBUG=monax nodemon index.js --ignore 'apps/'"
 	},
 	"devDependencies": {
-		"eslint-config-google": "^0.9.1"
+		"eslint-config-google": "^0.9.1",
+		"eslint-plugin-playlyfe": "^4.0.3"
 	}
 }
