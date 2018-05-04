@@ -20,10 +20,10 @@ var accountData         = require('/home/ubuntu/.monax/chains/multichain/account
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
         /* FULL (newContractManagerDev)  */
-var burrow 		= burrowModule.createInstance(_burrowrpcURL);
-var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000);
+var burrow 		= burrowModule.createInstance(_burrowrpcURL);                           /* legacy-db */
+var tx                  = burrow.txs();                                                         /* transaction burrow */                                   
+var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000); /* legacy-contract */
 var contractManager 	= contracts.newContractManager(pipe);
-
 var myContract          = contractManager.newContractFactory(ABI).at(address);
 
         /* express js */
@@ -52,9 +52,8 @@ var tx      = express.Router();
         });
 
         account.get('/', (req, res) => {
-                res.json({ message : "this is first page of api go"});
+                res.json({ message : "this is first page of api"});
         });
-
 
         /*      /acc/accounts                    GET     get all accounts
                 /acc/accounts                    POST    create accounts
@@ -62,6 +61,12 @@ var tx      = express.Router();
                 /acc/accounts/:acc_id            PUT     update account by id
                 /acc/accounts/:acc_id            DELETE  delete account by id
         */
+
+        account.route('/gets')
+                .get( (req, res) => {
+                        res.json(pipe.listAccount());
+                })
+
 
         account.route('/create')
                 .post((req, res) => {
@@ -80,8 +85,8 @@ var tx      = express.Router();
                                         console.log("error on request to generate account");
                                         res.json( { message : "error on request to generate account", status : 0} );
                                 }
-                        })
-                })
+                        });
+                });
         
         account.route('/generate')
                 .get((req, res) => {
@@ -92,7 +97,7 @@ var tx      = express.Router();
                                 var address = obj.address;
                                 var pub     = obj.pub_key[1];
                                 var pri     = obj.priv_key[1];
-                                let newDataObj = {  address : address, pubKey : pub, privKey : pri};
+                                let newDataObj = {address : address, pubKey : pub, privKey : pri};
                                 res.json(newDataObj);
                             }else{
                                 console.log(error);
@@ -101,13 +106,6 @@ var tx      = express.Router();
                         });
                 });
 
-/*         account.route('/add')
-                .post((req, res) => {
-                        let addr        = req.body.addr;
-                        let pubkey      = req.body.pk;
-                        let privKey     = req.body.pik;
-                        return ( pipe.addAccount());
-                }); */
         
         /****************************************************************
          ******** TRANSACTION 
@@ -122,14 +120,16 @@ var tx      = express.Router();
                 res.json({ message : "this is first page of transaction api"});
         });
 
-        /*      /tx/sendtoken              POST???
+        /*      /tx/sendtoken                   POST    send token by address with privkey and amount
         */
         tx.route('/sendtoken')
                 .get( (req, res) => {
-
+                        res.json({ message : "use POST instead."});
                 })
                 .post((req, res) => {
-
+                        /* FIXME: no indicator if is error or not */
+                        tx.sendAndHold( req.body.privKey, req.body.address, req.body.amt, globalCallback() );
+                        res.json({ message : "the transaction may be in queue for validate, you can quit this page for now"});
                 })
 
 
@@ -140,6 +140,10 @@ var tx      = express.Router();
         function addAccount(jsonObj){
                 // let newAccount = { address : addr, pubKey : pubk, privKey : prik };
                 return pipe.addAccount(jsonObj);
+        }
+
+        function globalCallback(){
+                console.log("Operated...");
         }
 
 /* All account request prefix with "/acc" */
