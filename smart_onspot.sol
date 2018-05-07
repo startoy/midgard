@@ -41,7 +41,7 @@ contract Onspot {
 
 	/*----------------- CONFIG SETTING --------------*/
 	
-	function Onspot(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) {
+	function Onspot(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) return (int onspotEnd,int redeemEnd) {
 		onspotEnd = _startTime  + (_endTime  - _startTime);
 		redeemEnd = _startTime2 + (_endTime2 - _startTime2);
 	}
@@ -53,7 +53,7 @@ contract Onspot {
 		onspot_time = onspotEnd;
 		redeem_time = redeemEnd;
 	}
-	function adjust_activityTime(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2)
+	function adjust_activityTime(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) return (int onspotEnd,int redeemEnd)
 	{
 		onspotEnd = _startTime + (_endTime - _startTime);
     redeemEnd = _startTime2 + (_endTime2 - _startTime2);
@@ -61,7 +61,7 @@ contract Onspot {
 
 	/*---------------- STOCK -------------------*/
 	
-	function add_stock(uint _id, string _name, uint _amount, uint _price) returns (uint)
+	function add_stock(uint _id, string _name, uint _amount, uint _price) returns (int)
 	{
 	   if(equal(stocks[_id].name,""))
 	   {
@@ -78,10 +78,10 @@ contract Onspot {
 	   return 0;
 	}
 	
-	function delete_stock(uint _id) returns (uint)
+	function delete_stock(uint _id) returns (int)
 	{
 		delete stocks[_id];
-		for(uint i =0; i < stock_list.length ; i++)
+		for(uint i = 0; i < stock_list.length ; i++)
 		{
 			if(stock_list[i] == _id)
 			{
@@ -122,7 +122,7 @@ contract Onspot {
 		return (str);		
   }
 
-	function adjust_stock(uint _id,string _name,uint _amount,uint _price) returns (uint)
+	function adjust_stock(uint _id,string _name,uint _amount,uint _price) returns (int)
 	{
 		if(equal(stocks[_id].name,""))
 			return 0;
@@ -141,7 +141,7 @@ contract Onspot {
 	
 	/*--------------- EMPLOOYEE FUNCTION ------------------*/
 
-	function create_employee(address _address,uint _id,string _name) returns (uint)
+	function create_employee(address _address,uint _id,string _name) returns (int)
 	{
 		if(employees[_address].id == 0)
 		{

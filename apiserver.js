@@ -139,7 +139,7 @@ tx.route('/sendtoken')
         });
 
 /****************************************************************
- ******** SMART CONTRACT / SOLIDITY
+ ******** SMART CONTRACT / SOLIDITY - CONFIG
  *****************************************************************/
 
 sol.get('/', (req, res) => {
@@ -179,7 +179,7 @@ sol.route('/testsettime')
                         (error, res2) => {
                                 if (error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "success time query!", "fail time query!"))
+                                res.json(util.resSolLog(res2, "contractTime_test success!", "contractTime_test fail!"))
                         }
                 )
         })
@@ -191,7 +191,7 @@ sol.route('/cnf-onspot')
                         req.body.endTime,
                         req.body.startRedeemTime,
                         req.body.endRedeemTime,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
@@ -207,7 +207,7 @@ sol.route('/cnf-adjtime')
                         req.body.endTime,
                         req.body.startRedeemTime,
                         req.body.endRedeemTime,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
@@ -227,11 +227,11 @@ stock.route('/add')
                         req.body.name,
                         req.body.amount,
                         req.body.price,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "added", "add fail"))
+                                res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
                         }
                 )
         })
@@ -240,7 +240,7 @@ stock.route('/delete')
         .post((req ,res) => {
                 myContract.delete_stock(
                         req.body.id,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
@@ -252,11 +252,11 @@ stock.route('/delete')
 stock.route('/get')
         .get((req ,res) => {
                 myContract.getStockList(
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "delete success", "delete fail"))
+                                res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
                         }
                 )
         })
@@ -268,15 +268,14 @@ sol.route('/update')
                         req.body.name,
                         req.body.amount,
                         req.body.price,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "update stock success!", "update stock fail!"))
                         }
                 )
         })
-
 
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - EMPLOYEES
@@ -284,99 +283,99 @@ sol.route('/update')
 
 emp.route('/create')
         .post((req ,res) => {
-                myContract.adjust_stock(
+                myContract.create_employee(
                         req.body.address,
                         req.body.id,
                         req.body.name,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "emp created!", "emp create fail!"))
                         }
                 )
-        })
-
-emp.route('/get')
-        .post((req ,res) => {
-                myContract.adjust_stock(
-                        req.body.address,
-                        {from : req.body.calleraddress},
-                        (error, res2) => {
-                                if(error)
-                                        res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
-                        }
-                )
-        })       
+        })    
 
 emp.route('/give')
         .post((req ,res) => {
                 myContract.give_onspot(
                         req.body.sender,
                         req.body.reciever,
-                        req.body.corevalue,
+                        req.body.coreValue,
                         req.body.description,
                         Math.floor(Date.now() / 1000),
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail"))
                         }
                 )
         })        
 
 emp.route('/redeem')
         .post((req ,res) => {
-                myContract.give_onspot(
+                myContract.redeem_gift(
                         req.body.address,
                         req.body.stockid,
                         Math.floor(Date.now() / 1000),
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
                         }
                 )
         })
 
 emp.route('/history')
         .post((req ,res) => {
-                myContract.give_onspot(
+                myContract.getHistory(
                         req.body.address,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
                         }
                 )
         })
 
 emp.route('/empredeem')
         .post((req ,res) => {
-                myContract.give_onspot(
+                myContract.getEmployeeRedeem(
                         req.body.address,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
                         }
                 )
         })
 
-emp.route('/clear')
+emp.route('/get')
         .post((req ,res) => {
-                myContract.give_onspot(
+                myContract.getEmployee(
                         req.body.address,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
+                        }
+                )
+        })  
+
+emp.route('/clear')
+        .post((req ,res) => {
+                myContract.clearData(
+                        req.body.address,
+                        {from : req.body.callerAddress},
+                        (error, res2) => {
+                                if(error)
+                                        res.json(util.resLog(error, 0));
+                                res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))
                         }
                 )
         })  
@@ -387,7 +386,7 @@ sol.route('/onspot')
                         req.body.id,
                         req.body.name,
                         req.body.amount,
-                        {from : req.body.calleraddress},
+                        {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error)
                                         res.json(util.resLog(error, 0));
