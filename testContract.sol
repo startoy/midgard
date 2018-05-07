@@ -1,6 +1,9 @@
 pragma solidity ^ 0.4.4;
 contract TestContract {
 
+    uint onspotEnd;
+		uint redeemEnd;
+
     uint[] public stock_list;
     mapping (uint => Stock) stocks;
     address public testAddress;
@@ -52,7 +55,7 @@ contract TestContract {
 		bytes memory b = bytes(_b);
 		uint minLength = a.length;
 		if (b.length < minLength) minLength = b.length;
-		//@todo unroll the loop into increments of 32 and do full 32 byte comparisons
+		//@TODO: unroll the loop into increments of 32 and do full 32 byte comparisons
 		for (uint i = 0; i < minLength; i ++)
 		if (a[i] < b[i])
 			return -1;
@@ -70,9 +73,10 @@ contract TestContract {
 		return compare(_a, _b) == 0;
 	}
 
-	function contractTime_test() returns (uint now_time, uint onspot_time, uint redeem_time)
+	function contractTime_test(uint serverUnixTime) returns (uint now_time, uint onspot_time, uint redeem_time)
 	{
-		now_time 	= now;
+		// now_time 	= now;
+		now_time = serverUnixTime;
 		onspot_time = onspotEnd;
 		redeem_time = redeemEnd;
 	}
