@@ -294,6 +294,19 @@ emp.route('/create')
                 )
         })
 
+emp.route('/get')
+        .post((req ,res) => {
+                myContract.adjust_stock(
+                        req.body.address,
+                        {from : req.body.calleraddress},
+                        (error, res2) => {
+                                if(error)
+                                        res.json(util.resLog(error, 0));
+                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                        }
+                )
+        })       
+
 emp.route('/give')
         .post((req ,res) => {
                 myContract.give_onspot(
@@ -314,7 +327,7 @@ emp.route('/give')
 emp.route('/redeem')
         .post((req ,res) => {
                 myContract.give_onspot(
-                        req.body.req,
+                        req.body.address,
                         req.body.stockid,
                         Math.floor(Date.now() / 1000),
                         {from : req.body.calleraddress},
@@ -324,7 +337,46 @@ emp.route('/redeem')
                                 res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
                         }
                 )
-        })           
+        })
+
+emp.route('/history')
+        .post((req ,res) => {
+                myContract.give_onspot(
+                        req.body.address,
+                        {from : req.body.calleraddress},
+                        (error, res2) => {
+                                if(error)
+                                        res.json(util.resLog(error, 0));
+                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                        }
+                )
+        })
+
+emp.route('/empredeem')
+        .post((req ,res) => {
+                myContract.give_onspot(
+                        req.body.address,
+                        {from : req.body.calleraddress},
+                        (error, res2) => {
+                                if(error)
+                                        res.json(util.resLog(error, 0));
+                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                        }
+                )
+        })
+
+emp.route('/clear')
+        .post((req ,res) => {
+                myContract.give_onspot(
+                        req.body.address,
+                        {from : req.body.calleraddress},
+                        (error, res2) => {
+                                if(error)
+                                        res.json(util.resLog(error, 0));
+                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                        }
+                )
+        })  
 /* PATTERN *//*   
 sol.route('/onspot')
         .post((req ,res) => {
