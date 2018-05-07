@@ -2,4 +2,4 @@ jobs:
 
 - name: deployNewSmartContract
   deploy:
-      contract: testContract.sol 
+      contract: smart_onspot.sol 

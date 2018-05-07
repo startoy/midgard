@@ -15,7 +15,7 @@ _burrowrpcURL     	= "http://0.0.0.0:1337/rpc"
 _keysURL          	= "http://0.0.0.0:4767";
 
         /* read config file */
-var address             = require('./epm.output.json').deploySmart;
+var address             = require('./epm.output.json').deployNewSmartContract;
 var ABI                 = JSON.parse(fs.readFileSync('./abi/' + address, 'utf8'));
 var accountData         = require('/home/ubuntu/.monax/chains/multichain/accounts.json');
 
@@ -43,6 +43,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var account = express.Router();
 var tx      = express.Router();
 var sol	    = express.Router();
+var stock   = express.Router();
+var emp	    = express.Router();
+
 /****************************************************************
  ******** ACCOUNT 
  *****************************************************************/
