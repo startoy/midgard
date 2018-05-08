@@ -154,7 +154,7 @@ sol.route('/cnf-onspot')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                console.log("config onspot time...");
+                                util.serverLog("config onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -174,7 +174,7 @@ sol.route('/cnf-adjtime')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                console.log("config new onspot time...");
+                                util.serverLog("config new onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -198,11 +198,10 @@ stock.route('/add')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                console.log("add stock item...");
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
 				}else{
-                                	res.json(util.resSolLog(res2, "stock added!", "stock fail added!", whereIs))
+                                	res.json(util.resSolLog(res2, "stock added!", "stock fail to added!", whereIs))
 				}
                         }
                 )
@@ -215,7 +214,6 @@ stock.route('/delete')
                         req.body.id,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                console.log("delete stock item...");
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -253,7 +251,6 @@ stock.route('/update')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                console.log("update stock...");
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -299,7 +296,7 @@ emp.route('/give')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail", whereIs))
+                                        res.json(util.resSolLog(res2, "give onspot success!", "give onspot fail", whereIs))
                                 }
                         }
                 )
@@ -359,13 +356,13 @@ emp.route('/empredeem')
 
 emp.route('/get')
         .post((req ,res) => {
-                let whereIs = req.originalUrl;
+                var whereIs = req.originalUrl;
                 myContract.getEmployee(
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.send(util.resLog(error.message, 0)); 
+                                        res.send(util.resLog(error.message, 0, whereIs)); 
 				}else{
                                         res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!", whereIs))
                                 }
@@ -380,8 +377,6 @@ emp.route('/clear')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("response : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
