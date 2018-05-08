@@ -186,7 +186,7 @@ sol.route('/testsettime')
 
 sol.route('/cnf-onspot')
         .post((req ,res) => {
-                myContract.Onspot(
+                myContract.onspot(
                         req.body.startTime,
                         req.body.endTime,
                         req.body.startRedeemTime,
@@ -261,7 +261,7 @@ stock.route('/get')
                 )
         })
 
-sol.route('/update')
+stock.route('/update')
         .post((req ,res) => {
                 myContract.adjust_stock(
                         req.body.id,

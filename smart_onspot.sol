@@ -3,7 +3,7 @@ pragma solidity ^0.4.4;
 contract Onspot {
 
 	uint onspotEnd;
-  uint redeemEnd;
+  	uint redeemEnd;
 
 	struct Stock {
 		uint    id;
@@ -41,9 +41,12 @@ contract Onspot {
 
 	/*----------------- CONFIG SETTING --------------*/
 	
-	function Onspot(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) return (int onspotEnd,int redeemEnd) {
+	function onspot(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) returns (uint onspot_time, uint redeem_time)
+	{
 		onspotEnd = _startTime  + (_endTime  - _startTime);
 		redeemEnd = _startTime2 + (_endTime2 - _startTime2);
+		onspot_time = onspotEnd;
+		redeem_time = redeemEnd;
 	}
 
 	function contractTime_test(uint serverUnixTime) returns (uint now_time, uint onspot_time, uint redeem_time)
@@ -53,10 +56,10 @@ contract Onspot {
 		onspot_time = onspotEnd;
 		redeem_time = redeemEnd;
 	}
-	function adjust_activityTime(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) return (int onspotEnd,int redeemEnd)
+	function adjust_activityTime(uint _startTime, uint _endTime, uint _startTime2, uint _endTime2) returns (uint onspotEnd,uint redeemEnd)
 	{
-		onspotEnd = _startTime + (_endTime - _startTime);
-    redeemEnd = _startTime2 + (_endTime2 - _startTime2);
+		onspotEnd = _startTime +  (_endTime  - _startTime);
+    		redeemEnd = _startTime2 + (_endTime2 - _startTime2);
 	}
 
 	/*---------------- STOCK -------------------*/
