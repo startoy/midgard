@@ -229,9 +229,11 @@ stock.route('/add')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error){
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
+				}else{
+                                	res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
+				}
                         }
                 )
         })
@@ -242,6 +244,8 @@ stock.route('/delete')
                         req.body.id,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("delete : " + res2);
+				console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "delete success", "delete fail"))
@@ -250,10 +254,12 @@ stock.route('/delete')
         })
 
 stock.route('/get')
-        .get((req ,res) => {
+        .post((req ,res) => {
                 myContract.getStockList(
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("getStockList : " + res2);
+                                console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
@@ -321,6 +327,8 @@ emp.route('/redeem')
                         Math.floor(Date.now() / 1000),
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("response : " + res2);
+				console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
@@ -334,6 +342,8 @@ emp.route('/history')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("response : " + res2);
+                                console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
@@ -347,6 +357,8 @@ emp.route('/empredeem')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("response : " + res2);
+                                console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
@@ -360,6 +372,8 @@ emp.route('/get')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("response : " + res2);
+                                console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
@@ -373,6 +387,8 @@ emp.route('/clear')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("response : " + res2);
+                                console.log("error : " + error);
                                 if(error)
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))

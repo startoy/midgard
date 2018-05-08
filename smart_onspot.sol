@@ -201,7 +201,7 @@ contract Onspot {
 	
 	function getHistory(address _req) constant returns(string) {
 		uint 	num 	= employees[_req].count_myHistory;
-		var 	str 	= "";
+		var 	str 	= "0";
 		var 	count = "";
 		for (uint i = 0; i < num; i++) {
 			count = uintToString(employees[_req].myHistory[i].id_sender);
@@ -222,9 +222,9 @@ contract Onspot {
 	function getEmployeeRedeem(address _req) constant returns (string)
 	{
 		uint 	num 	= countStocks();
-		var 	str 	= "";
-	  var 	count = "";
-		for(uint i =1; i<=num ; i++)
+		var 	str 	= "0";
+	  	var 	count = "";
+		for(uint i = 1; i<=num ; i++)
 		{
 			if(employees[_req].myStock[i].amount != 0)
 			{
