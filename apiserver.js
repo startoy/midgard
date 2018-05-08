@@ -33,8 +33,6 @@ const app       	= express();
 const port      	= process.env.PORT || 8080;
 const _url              = "http://0.0.0.0:" + port;
 const _url_acc          = _url + "/acc";
-const _url_tx           = _url + "/tx";
-const _url_sol		= _url + "/sol";
 
         /* for .post request */
 app.use(bodyParser.json());
@@ -63,12 +61,13 @@ account.get('/', (req, res) => {
 
 account.route('/gets')
         .get((req, res) => {
+
                 res.json(pipe.listAccount());
         })
 
-
 account.route('/create')
         .post((req, res) => {
+                let whereIs = req.originalUrl;
                 //call create account
                 let options = {
                         url: _url_acc + '/generate'
@@ -76,21 +75,19 @@ account.route('/create')
                 request.get(options, (err, res2, body) => {
                         if (!err && res2.statusCode == 200) {
                                 if (pipe.addAccount(JSON.parse(body))) {
-                                        console.log("success add account");
-                                        res.json(util.resLog("success", 1, JSON.parse(body)));
+                                        res.json(util.resLog("account added!", 1, whereIs, JSON.parse(body)));
                                 } else {
-                                        console.log("failed add account");
-                                        res.json(util.resLog("failed", 0));
+                                        res.json(util.resLog("failed to add this account.", 0, whereIs));
                                 }
                         } else {
-                                console.log("error on request to generate account");
-                                res.json(util.resLog("error on request to generate account", 0));
+                                res.json(util.resLog(err.message, 0, whereIs));
                         }
                 });
         });
 
 account.route('/generate')
         .get((req, res) => {
+                let whereIs = req.originalUrl;
                 let options = {
                         url: _burrowURL + '/' + 'unsafe/pa_generator'
                 };
@@ -107,7 +104,7 @@ account.route('/generate')
                                 };
                                 res.json(newDataObj);
                         } else {
-                                res.json(util.resLog(error.message, 0))
+                                res.json(util.resLog(error.message, 0, whereIs));
                         }
                 });
         });
@@ -126,6 +123,7 @@ tx.route('/sendtoken')
                 res.json(util.resLog("use POST method to send token", 0));
         })
         .post((req, res) => {
+                let whereIs = req.originalUrl;
                 /* TODO: no indicator if is error or not */
                 let tx = burrow.txs();
                 tx.sendAndHold(req.body.privkey,
@@ -135,7 +133,7 @@ tx.route('/sendtoken')
                                 console.log("called" + i);
                         }
                 );
-                res.json(util.resLog("this call may take time, you can quit this page for now", 1));
+                res.json(util.resLog("this call may take time, you can quit this page for now", 1, whereIs));
         });
 
 /****************************************************************
@@ -148,6 +146,7 @@ sol.get('/', (req, res) => {
 
 sol.route('/cnf-onspot')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.onspot(
                         req.body.startTime,
                         req.body.endTime,
@@ -155,10 +154,11 @@ sol.route('/cnf-onspot')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+                                console.log("config onspot time...");
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "initial onspot success", "initial onspot fail"))
+                                        res.json(util.resSolLog(res2, "initial onspot success", "initial onspot fail", whereIs))
                                 }
                         }
                 )
@@ -166,6 +166,7 @@ sol.route('/cnf-onspot')
 
 sol.route('/cnf-adjtime')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.adjust_activityTime(
                         req.body.startTime,
                         req.body.endTime,
@@ -173,10 +174,11 @@ sol.route('/cnf-adjtime')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+                                console.log("config new onspot time...");
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "adjust activity time success", "adjust activity time fail"))
+                                        res.json(util.resSolLog(res2, "adjust activity time success", "adjust activity time fail", whereIs))
                                 }
                         }
                 )
@@ -188,6 +190,7 @@ sol.route('/cnf-adjtime')
 
 stock.route('/add')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.add_stock(
                         req.body.id,
                         req.body.name,
@@ -195,10 +198,11 @@ stock.route('/add')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+                                console.log("add stock item...");
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
 				}else{
-                                	res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
+                                	res.json(util.resSolLog(res2, "stock added!", "stock fail added!", whereIs))
 				}
                         }
                 )
@@ -206,30 +210,34 @@ stock.route('/add')
 
 stock.route('/delete')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.delete_stock(
                         req.body.id,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+                                console.log("delete stock item...");
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "delete success", "delete fail"))
+                                        res.json(util.resSolLog(res2, "delete success", "delete fail", whereIs))
                                 }
                         }
                 )
         })
 
+/* FIXME: can't use this func ?!? */
 stock.route('/get')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.getStockList(
                         {from : req.body.callerAddress},
                         (error, res2) => {
 				console.log("getStockList : " + res2);
                                 console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
+                                        res.json(util.resSolLog(res2, "get stock success!", "get stock fail!", whereIs))
                                 }
                         }
                 )
@@ -237,6 +245,7 @@ stock.route('/get')
 
 stock.route('/update')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.adjust_stock(
                         req.body.id,
                         req.body.name,
@@ -244,10 +253,11 @@ stock.route('/update')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
+                                console.log("update stock...");
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "update stock success!", "update stock fail!"))
+                                        res.json(util.resSolLog(res2, "update stock success!", "update stock fail!", whereIs))
                                 }
                         }
                 )
@@ -259,6 +269,7 @@ stock.route('/update')
 
 emp.route('/create')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.create_employee(
                         req.body.address,
                         req.body.id,
@@ -266,9 +277,9 @@ emp.route('/create')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "emp created!", "emp create fail!"))
+                                        res.json(util.resSolLog(res2, "emp created!", "emp create fail!", whereIs))
                                 }
                         }
                 )
@@ -276,6 +287,7 @@ emp.route('/create')
 
 emp.route('/give')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.give_onspot(
                         req.body.sender,
                         req.body.reciever,
@@ -285,9 +297,9 @@ emp.route('/give')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail"))
+                                        res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail", whereIs))
                                 }
                         }
                 )
@@ -295,6 +307,7 @@ emp.route('/give')
 
 emp.route('/redeem')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.redeem_gift(
                         req.body.address,
                         req.body.stockid,
@@ -302,39 +315,43 @@ emp.route('/redeem')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
+                                        res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!", whereIs))
                                 }
                         }
                 )
         })
 
+/* FIXME: can't use this */
 emp.route('/history')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.getHistory(
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
+                                        res.json(util.resSolLog(res2, "get history success!", "get history fail!", whereIs))
                                 }
                         }
                 )
         })
 
+/* FIXME: can't use this */
 emp.route('/empredeem')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.getEmployeeRedeem(
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
+                                        res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!", whereIs))
                                 }
                         }
                 )
@@ -342,6 +359,7 @@ emp.route('/empredeem')
 
 emp.route('/get')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.getEmployee(
                         req.body.address,
                         {from : req.body.callerAddress},
@@ -349,7 +367,7 @@ emp.route('/get')
                                 if(error) {
                                         res.send(util.resLog(error.message, 0)); 
 				}else{
-                                        res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
+                                        res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!", whereIs))
                                 }
                         }
                 )
@@ -357,6 +375,7 @@ emp.route('/get')
 
 emp.route('/clear')
         .post((req ,res) => {
+                let whereIs = req.originalUrl;
                 myContract.clearData(
                         req.body.address,
                         {from : req.body.callerAddress},
@@ -364,9 +383,9 @@ emp.route('/clear')
 				console.log("response : " + res2);
                                 console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
+                                        res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))
+                                        res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!", whereIs))
                                 }
                         }
                 )
@@ -381,8 +400,8 @@ sol.route('/onspot')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error.message, 0));
-                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
+                                        res.json(util.resLog(error.message, 0, whereIs));
+                                res.json(util.resSolLog(res2, "msgsuccess", "msgfail", whereIs))
                         }
                 )
         })

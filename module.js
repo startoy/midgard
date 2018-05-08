@@ -18,10 +18,11 @@
 	   *strict msg and status have to return
         */
 
-        exports.resLog = (msg, statusNum, body) => {
+        exports.resLog = (msg, statusNum, whereIs, body) => {
                 //callback && callback();   // if have callback, call it
                 if (!msg) msg = "calling success";
                 if (!this.isNumber(statusNum) && statusNum != 0) statusNum = 1;
+                ServerLog(msg, whereIs);
                 return {
                         message: msg,
                         status: statusNum,
@@ -41,7 +42,7 @@
                 };
         }
 
-        exports.resSolLog = (statusReturn, successMsg, failMsg) => {
+        exports.resSolLog = (statusReturn, successMsg, failMsg, whereIs) => {
                 /* default value */
                 sc = successMsg;
                 fa = failMsg;
@@ -57,11 +58,16 @@
                         return ( s ? { message: sc, status: s } : { message: fa, status: s });
                 } else if (statusReturn == "") {
                         /* if is nothing/null */
-                        return this.resLog("null status return from sol/smart contract", 1);
+                        return this.resLog("null status return from sol/smart contract", 1, whereIs);
                 } else {
                         /* if is not number and not null, would be a body -> send as body*/
-                        return this.resLog(sc, 1, statusReturn);
+                        return this.resLog(sc, 1, whereIs, statusReturn);
                 }
+        }
+
+        exports.ServerLog = (msg, WhereIs) => {
+                //if(unixTimeFlag) console.log("[Unix:"+Math.floor(Date.now() / 1000)+"]");
+                console.log("["+Date.now()+"] (" + WhereIs +") : " + msg);
         }
 
         exports.isNumber = (victim) => {
