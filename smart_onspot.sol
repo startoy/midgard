@@ -99,7 +99,7 @@ contract Onspot {
 	function getStockList() constant returns (string)
 	{
 		uint num 		= countStocks();
-    var str 		=	"";
+    var str 		=	"0";
 		var id 			= "";
 		var amount	= "";
 		var price 	= "";
