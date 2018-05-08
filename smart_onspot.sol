@@ -66,14 +66,14 @@ contract Onspot {
 	
 	function add_stock(uint _id, string _name, uint _amount, uint _price) returns (int)
 	{
-	   if(equal(stocks[_id].name,""))
+	   if(!equal(stocks[_id].name,""))
 	   {
 			var stock 		= stocks[_id];
 			stock.id   		= _id;
 			stock.name 		= _name;
 			stock.amount 	= _amount;
 			stock.price 	= _price;
-			stock_list.push(_id) -1;
+			stock_list.push(_id) - 1;
 
 			return 1;
 	   }
@@ -96,7 +96,7 @@ contract Onspot {
 		return 1;
   }
 
-	function getStockList() constant returns (string)
+	function getStockList() view returns (string)
 	{
 		uint num 		= countStocks();
     var str 		=	"0";
@@ -153,7 +153,7 @@ contract Onspot {
 						epm.name 	= _name;
 						epm.myWallet.onspot = 3;
 						epm.myWallet.ticket = 0;
-						emp_list.push(_address) -1;
+						emp_list.push(_address) - 1;
 			
 			return 1;
 		}
@@ -199,9 +199,9 @@ contract Onspot {
 		return -1;
 	}
 	
-	function getHistory(address _req) constant returns(string) {
-		uint 	num 	= employees[_req].count_myHistory;
-		var 	str 	= "0";
+	function getHistory(address _req) view returns(string) {
+		uint 	num = employees[_req].count_myHistory;
+		var 	str = "0";
 		var 	count = "";
 		for (uint i = 0; i < num; i++) {
 			count = uintToString(employees[_req].myHistory[i].id_sender);
@@ -219,11 +219,11 @@ contract Onspot {
 		return (str);
 	}
 	
-	function getEmployeeRedeem(address _req) constant returns (string)
+	function getEmployeeRedeem(address _req) view returns (string)
 	{
-		uint 	num 	= countStocks();
-		var 	str 	= "0";
-	  	var 	count = "";
+		uint 	num = countStocks();
+		var 	str = "0";
+		var 	count = "";
 		for(uint i = 1; i<=num ; i++)
 		{
 			if(employees[_req].myStock[i].amount != 0)
@@ -286,7 +286,7 @@ contract Onspot {
 		for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
 		return string(babcde);
 	}
-	function uintToString(uint v) constant returns(string str) {
+	function uintToString(uint v) view returns(string str) {
 
 		uint maxlength = 100;
 		bytes memory reversed = new bytes(maxlength);
@@ -323,9 +323,9 @@ contract Onspot {
 			return 0;
 	}
 
-	function equal(string _a, string _b) returns(bool) {
-		return compare(_a, _b) == 0;
-	}
+    function equal(string _a, string _b) returns(bool) {
+		    return compare(_a, _b) == 0;
+    }
 
 	function indexOf(string _haystack, string _needle) returns(int) {
 		bytes memory h = bytes(_haystack);
@@ -348,6 +348,6 @@ contract Onspot {
 			}
 			return -1;
 		}
-	}
+    }
 
-	}
+}

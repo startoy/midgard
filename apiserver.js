@@ -160,9 +160,11 @@ sol.route('/stock')
                         },
                         (error, res2) => {
                                 // depend on smart contract if is return something.
-                                if (error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "added !", "failed !"));
+                                }else{
+                                        res.json(util.resSolLog(res2, "added !", "failed !"));
+                                }
                         }
                 )
         });
@@ -177,9 +179,11 @@ sol.route('/testsettime')
                         Math.floor(Date.now() / 1000),
                         {from: req.body.address},
                         (error, res2) => {
-                                if (error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
+                                }else{
                                 res.json(util.resSolLog(res2, "contractTime_test success!", "contractTime_test fail!"))
+                                }
                         }
                 )
         })
@@ -193,9 +197,11 @@ sol.route('/cnf-onspot')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "initial onspot success", "initial onspot fail"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "initial onspot success", "initial onspot fail"))
+                                }
                         }
                 )
         })
@@ -209,9 +215,11 @@ sol.route('/cnf-adjtime')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "adjust activity time success", "adjust activity time fail"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "adjust activity time success", "adjust activity time fail"))
+                                }
                         }
                 )
         })
@@ -229,7 +237,7 @@ stock.route('/add')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error){
+                                if(error) {
                                         res.json(util.resLog(error, 0));
 				}else{
                                 	res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
@@ -246,9 +254,11 @@ stock.route('/delete')
                         (error, res2) => {
 				console.log("delete : " + res2);
 				console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "delete success", "delete fail"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "delete success", "delete fail"))
+                                }
                         }
                 )
         })
@@ -260,9 +270,11 @@ stock.route('/get')
                         (error, res2) => {
 				console.log("getStockList : " + res2);
                                 console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
+                                }
                         }
                 )
         })
@@ -276,9 +288,11 @@ sol.route('/update')
                         req.body.price,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "update stock success!", "update stock fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "update stock success!", "update stock fail!"))
+                                }
                         }
                 )
         })
@@ -295,9 +309,11 @@ emp.route('/create')
                         req.body.name,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "emp created!", "emp create fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "emp created!", "emp create fail!"))
+                                }
                         }
                 )
         })    
@@ -312,9 +328,11 @@ emp.route('/give')
                         Math.floor(Date.now() / 1000),
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail"))
+                                }
                         }
                 )
         })        
@@ -329,9 +347,11 @@ emp.route('/redeem')
                         (error, res2) => {
 				console.log("response : " + res2);
 				console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
+                                }
                         }
                 )
         })
@@ -344,9 +364,11 @@ emp.route('/history')
                         (error, res2) => {
 				console.log("response : " + res2);
                                 console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
+                                }
                         }
                 )
         })
@@ -359,9 +381,11 @@ emp.route('/empredeem')
                         (error, res2) => {
 				console.log("response : " + res2);
                                 console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
+                                }
                         }
                 )
         })
@@ -374,9 +398,11 @@ emp.route('/get')
                         (error, res2) => {
 				console.log("response : " + res2);
                                 console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
+                                }
                         }
                 )
         })  
@@ -389,9 +415,11 @@ emp.route('/clear')
                         (error, res2) => {
 				console.log("response : " + res2);
                                 console.log("error : " + error);
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
-                                res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))
+                                }else{
+                                        res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))
+                                }
                         }
                 )
         })  
@@ -404,7 +432,7 @@ sol.route('/onspot')
                         req.body.amount,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                if(error)
+                                if(error) {
                                         res.json(util.resLog(error, 0));
                                 res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
                         }
