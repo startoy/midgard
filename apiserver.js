@@ -23,7 +23,7 @@ var accountData         = require('/home/ubuntu/.monax/chains/multichain/account
 // var contractManager     = contracts.newContractManagerDev(burrowrpcURL, accountData.multichain_full_000); 
 
         /* FULL (newContractManagerDev)  */
-var burrow 		= burrowModule.createInstance(_burrowrpcURL);      /* legacy-db */
+var burrow 		= burrowModule.createInstance(_burrowrpcURL);  				/* legacy-db */
 var pipe 		= new contracts.pipes.DevPipe(burrow, accountData.multichain_full_000); /* legacy-contract */
 var contractManager 	= contracts.newContractManager(pipe);
 var myContract          = contractManager.newContractFactory(ABI).at(address);
@@ -54,6 +54,7 @@ var emp	    = express.Router();
                 console.log("Entering the account acc -> next()");
                 next();
         }); */
+
 account.get('/', (req, res) => {
         res.json({
                 message: "this is first page of api"
@@ -106,8 +107,7 @@ account.route('/generate')
                                 };
                                 res.json(newDataObj);
                         } else {
-                                console.log(error);
-                                res.json(util.resLog("something went wrong on generate account", 0));
+                                res.json(util.resLog(error.message, 0))
                         }
                 });
         });
@@ -146,51 +146,9 @@ sol.get('/', (req, res) => {
         res.json(util.resLog("this is first page of smart contract api", 1));
 });
 
-/* FIXME: DELETE THIS */
-sol.route('/stock')
-        .get((req, res) => {
-                res.json(util.resLog("use POST instead"));
-        })
-        .post((req, res) => {
-                myContract.add_stock(req.body.id,
-                        req.body.name,
-                        req.body.amount,
-                        req.body.price, {
-                                from: req.body.address
-                        },
-                        (error, res2) => {
-                                // depend on smart contract if is return something.
-                                if(error) {
-                                        res.json(util.resLog(error, 0));
-                                }else{
-                                        res.json(util.resSolLog(res2, "added !", "failed !"));
-                                }
-                        }
-                )
-        });
-
-/*      TODO:   add more api, use real smart contract
-        TODO:   CLIENT SCREEN CALL  */
-
-/* FIXME: DELETE THIS */
-sol.route('/testsettime')
-        .post((req, res) => {
-                myContract.contractTime_test(
-                        Math.floor(Date.now() / 1000),
-                        {from: req.body.address},
-                        (error, res2) => {
-                                if(error) {
-                                        res.json(util.resLog(error, 0));
-                                }else{
-                                res.json(util.resSolLog(res2, "contractTime_test success!", "contractTime_test fail!"))
-                                }
-                        }
-                )
-        })
-
 sol.route('/cnf-onspot')
         .post((req ,res) => {
-                myContract.Onspot(
+                myContract.onspot(
                         req.body.startTime,
                         req.body.endTime,
                         req.body.startRedeemTime,
@@ -198,7 +156,7 @@ sol.route('/cnf-onspot')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "initial onspot success", "initial onspot fail"))
                                 }
@@ -216,7 +174,7 @@ sol.route('/cnf-adjtime')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "adjust activity time success", "adjust activity time fail"))
                                 }
@@ -238,7 +196,7 @@ stock.route('/add')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
 				}else{
                                 	res.json(util.resSolLog(res2, "stock added!", "stock fail added!"))
 				}
@@ -252,10 +210,8 @@ stock.route('/delete')
                         req.body.id,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("delete : " + res2);
-				console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "delete success", "delete fail"))
                                 }
@@ -271,7 +227,7 @@ stock.route('/get')
 				console.log("getStockList : " + res2);
                                 console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "get stock success!", "get stock fail!"))
                                 }
@@ -279,7 +235,7 @@ stock.route('/get')
                 )
         })
 
-sol.route('/update')
+stock.route('/update')
         .post((req ,res) => {
                 myContract.adjust_stock(
                         req.body.id,
@@ -289,7 +245,7 @@ sol.route('/update')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "update stock success!", "update stock fail!"))
                                 }
@@ -310,7 +266,7 @@ emp.route('/create')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "emp created!", "emp create fail!"))
                                 }
@@ -329,7 +285,7 @@ emp.route('/give')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "giv onspot success!", "give onspot fail"))
                                 }
@@ -345,10 +301,8 @@ emp.route('/redeem')
                         Math.floor(Date.now() / 1000),
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("response : " + res2);
-				console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!"))
                                 }
@@ -362,10 +316,8 @@ emp.route('/history')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("response : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "get history success!", "get history fail!"))
                                 }
@@ -379,10 +331,8 @@ emp.route('/empredeem')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("response : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!"))
                                 }
@@ -396,11 +346,9 @@ emp.route('/get')
                         req.body.address,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("response : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
-                                }else{
+                                        res.send(util.resLog(error.message, 0)); 
+				}else{
                                         res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!"))
                                 }
                         }
@@ -416,7 +364,7 @@ emp.route('/clear')
 				console.log("response : " + res2);
                                 console.log("error : " + error);
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 }else{
                                         res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!"))
                                 }
@@ -433,7 +381,7 @@ sol.route('/onspot')
                         {from : req.body.callerAddress},
                         (error, res2) => {
                                 if(error) {
-                                        res.json(util.resLog(error, 0));
+                                        res.json(util.resLog(error.message, 0));
                                 res.json(util.resSolLog(res2, "msgsuccess", "msgfail"))
                         }
                 )

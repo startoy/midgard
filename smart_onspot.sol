@@ -66,7 +66,7 @@ contract Onspot {
 	
 	function add_stock(uint _id, string _name, uint _amount, uint _price) returns (int)
 	{
-	   if(!equal(stocks[_id].name,""))
+	   if(equal(stocks[_id].name,""))
 	   {
 			var stock 		= stocks[_id];
 			stock.id   		= _id;
@@ -96,7 +96,7 @@ contract Onspot {
 		return 1;
   }
 
-	function getStockList() view returns (string)
+	function getStockList() constant returns (string)
 	{
 		uint num 		= countStocks();
     var str 		=	"0";
@@ -199,7 +199,7 @@ contract Onspot {
 		return -1;
 	}
 	
-	function getHistory(address _req) view returns(string) {
+	function getHistory(address _req) constant returns(string) {
 		uint 	num = employees[_req].count_myHistory;
 		var 	str = "0";
 		var 	count = "";
@@ -219,7 +219,7 @@ contract Onspot {
 		return (str);
 	}
 	
-	function getEmployeeRedeem(address _req) view returns (string)
+	function getEmployeeRedeem(address _req) constant returns (string)
 	{
 		uint 	num = countStocks();
 		var 	str = "0";
@@ -286,7 +286,7 @@ contract Onspot {
 		for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
 		return string(babcde);
 	}
-	function uintToString(uint v) view returns(string str) {
+	function uintToString(uint v) constant  returns(string str) {
 
 		uint maxlength = 100;
 		bytes memory reversed = new bytes(maxlength);

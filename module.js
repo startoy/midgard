@@ -18,13 +18,13 @@
 	   *strict msg and status have to return
         */
 
-        exports.resLog = (msg, status, body) => {
+        exports.resLog = (msg, statusNum, body) => {
                 //callback && callback();   // if have callback, call it
                 if (!msg) msg = "calling success";
-                if (!this.isNumber(status)) status = 1;
+                if (!this.isNumber(statusNum) && statusNum != 0) statusNum = 1;
                 return {
                         message: msg,
-                        status: status,
+                        status: statusNum,
                         body
                 };
         }
@@ -33,7 +33,7 @@
                 callback && callback(); // if have callback, call it
                 // default value if null
                 if (!msg) msg = "calling success";
-                if (!this.isNumber(status)) status = 1;
+                if (!this.isNumber(status) && statusNum != 0) status = 1;
                 return {
                         message: msg,
                         status: status,
