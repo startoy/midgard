@@ -43,7 +43,7 @@ var tx      = express.Router();
 var sol	    = express.Router();
 var stock   = express.Router();
 var emp	    = express.Router();
-var utl    = express.Router();
+var utl     = express.Router();
 
 /****************************************************************
  ******** ACCOUNT 
@@ -421,7 +421,7 @@ utl.route('/uint')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "update stock successful!", "update stock fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get uint!", "fail to get uint!", whereIs))
                                 }
                         }
                 )
