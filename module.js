@@ -22,7 +22,7 @@
                 //callback && callback();   // if have callback, call it
                 if (!msg) msg = "calling success";
                 if (!this.isNumber(statusNum) && statusNum != 0) statusNum = 1;
-                ServerLog(msg, whereIs);
+                this.serverLog(msg, whereIs);
                 return {
                         message: msg,
                         status: statusNum,
@@ -50,13 +50,13 @@
 
                 if (!successMsg) sc = "calling success";
                 if (!failMsg)    fa = "calling failed";
-
-                if (this.isNumber(statusReturn)) {
+                if (this.isNumber(s)) {
                         /* if statusReturn from smart contract is number */
                         s = Number(statusReturn);
                         if (s == 0 || s == -1) s = 0;
-                        return ( s ? { message: sc, status: s } : { message: fa, status: s });
-                } else if (statusReturn == "") {
+                        //return ( s ? { message: sc, status: s } : { message: fa, status: s });
+                        return ( s ? this.resLog(sc, s, whereIs) : this.resLog(fa, s, whereIs));
+                } else if (s == "") {
                         /* if is nothing/null */
                         return this.resLog("null status return from sol/smart contract", 1, whereIs);
                 } else {
@@ -65,10 +65,19 @@
                 }
         }
 
-        exports.ServerLog = (msg, WhereIs) => {
+        exports.serverLog = (msg, WhereIs) => {
                 //if(unixTimeFlag) console.log("[Unix:"+Math.floor(Date.now() / 1000)+"]");
-                console.log("["+Date.now()+"] (" + WhereIs +") : " + msg);
+		let d = new Date(new Date().getTime() + 7*60*60*1000); // 7 hours later
+                //console.log("SERVER_LOG:[ ("+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+" "+d.get+") on (" + WhereIs +") : " + msg + "]");
+                console.log("SERVER_LOG:[("+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+") on (" + WhereIs +") : " + msg + "]");
         }
+/*
+new Date().toLocaleTimeString(); // 11:18:48 AM
+//---
+new Date().toLocaleDateString(); // 11/16/2015
+//---
+new Date().toLocaleString(); // 11/16/2015, 11:18:48 PM
+*/
 
         exports.isNumber = (victim) => {
                 // is type number( ex. "123" , 123) AND not null with "" (which is string null)
