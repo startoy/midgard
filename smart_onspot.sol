@@ -51,8 +51,7 @@ contract Onspot {
 
 	function contractTime_test(uint serverUnixTime) returns (uint now_time, uint onspot_time, uint redeem_time)
 	{
-		//now_time 		= now;
-		now_time 		= serverUnixTime;
+		now_time = serverUnixTime;
 		onspot_time = onspotEnd;
 		redeem_time = redeemEnd;
 	}
@@ -68,11 +67,11 @@ contract Onspot {
 	{
 	   if(equal(stocks[_id].name,""))
 	   {
-			var stock 		= stocks[_id];
-			stock.id   		= _id;
-			stock.name 		= _name;
-			stock.amount 	= _amount;
-			stock.price 	= _price;
+			var stock = stocks[_id];
+			stock.id  = _id;
+			stock.name = _name;
+			stock.amount = _amount;
+			stock.price = _price;
 			stock_list.push(_id) - 1;
 
 			return 1;
@@ -96,30 +95,31 @@ contract Onspot {
 		return 1;
   }
 
+
 	function getStockList() constant returns (string)
 	{
-		uint num 		= countStocks();
-    var str 		=	"0";
-		var id 			= "";
-		var amount	= "";
-		var price 	= "";
-		for(uint i = 0; i < num ; i++)
+		uint num = countStocks();
+    		var str = "";
+		var id = "";
+		var amount = "";
+		var price = "";
+		for(uint i =0; i < num ; i++)
 		{
 			uint j = stock_list[i];
-			id 	= uintToString(stocks[j].id);
+			id = uint2str(stocks[j].id);
 			str = strConcat(str,id);
 			str = strConcat (str,"|");
 
 			str = strConcat(str,stocks[j].name);
 			str = strConcat (str,"|");
 
-			amount = uintToString(stocks[j].amount);
-			str 	= strConcat(str,amount);
-			str 	= strConcat (str,"|");
+			amount = uint2str(stocks[j].amount);
+			str = strConcat(str,amount);
+			str = strConcat (str,"|");
 
-			price = uintToString(stocks[j].price);
-			str 	= strConcat(str,price);
-			str 	= strConcat(str,";");
+			price = uint2str(stocks[j].price);
+			str = strConcat(str,price);
+			str = strConcat(str,";");
 		}
 
 		return (str);		
@@ -130,9 +130,9 @@ contract Onspot {
 		if(equal(stocks[_id].name,""))
 			return 0;
 			
-		stocks[_id].name 		= _name; 
-		stocks[_id].amount 	= _amount; 
-		stocks[_id].price 	= _price;	
+		stocks[_id].name = _name; 
+		stocks[_id].amount = _amount; 
+		stocks[_id].price = _price;	
 		
 		return 1;
 	}
@@ -141,6 +141,10 @@ contract Onspot {
     {
         return stock_list.length;
     }	
+
+	function getStockItem(uint _id) constant returns (uint, string, uint, uint){
+		  return (stocks[_id].id,stocks[_id].name, stocks[_id].amount, stocks[_id].price);
+	}
 	
 	/*--------------- EMPLOOYEE FUNCTION ------------------*/
 
@@ -148,13 +152,12 @@ contract Onspot {
 	{
 		if(employees[_address].id == 0)
 		{
-						var epm 	= employees[_address];
-						epm.id 		= _id;
-						epm.name 	= _name;
-						epm.myWallet.onspot = 3;
-						epm.myWallet.ticket = 0;
-						emp_list.push(_address) - 1;
-			
+			var epm = employees[_address];
+			epm.id 	= _id;
+			epm.name = _name;
+			epm.myWallet.onspot = 3;
+			epm.myWallet.ticket = 0;
+			emp_list.push(_address) - 1;
 			return 1;
 		}
 		return 0;	
@@ -166,13 +169,13 @@ contract Onspot {
 		{
 			if(employees[_sender].myWallet.onspot <= 0)
 		  	   return 0;
-			employees[_sender].myWallet.onspot 		-= 1;
+			employees[_sender].myWallet.onspot -= 1;
 			employees[_receiver].myWallet.ticket  += 1;
 		
 			uint num = employees[_receiver].count_myHistory;  
 
-			employees[_receiver].myHistory[num].id_sender 	= employees[_sender].id;
-			employees[_receiver].myHistory[num].core_type 	= _coreValue;
+			employees[_receiver].myHistory[num].id_sender =  employees[_sender].id;
+			employees[_receiver].myHistory[num].core_type = _coreValue;
 			employees[_receiver].myHistory[num].description = _description;
 			employees[_receiver].count_myHistory += 1;
 			return 1;	
@@ -192,7 +195,7 @@ contract Onspot {
 			stocks[_stock_id].amount -= 1;
 
 			employees[_req].count_myStock.push(_stock_id);
-			employees[_req].myStock[_stock_id].name 	= stocks[_stock_id].name;
+			employees[_req].myStock[_stock_id].name = stocks[_stock_id].name;
 			employees[_req].myStock[_stock_id].amount += 1;
 			return 1;
 		}
@@ -200,20 +203,20 @@ contract Onspot {
 	}
 	
 	function getHistory(address _req) constant returns(string) {
-		uint 	num = employees[_req].count_myHistory;
-		var 	str = "0";
-		var 	count = "";
+		uint num = employees[_req].count_myHistory;
+		var str = "0";
+		var count = "";
 		for (uint i = 0; i < num; i++) {
-			count = uintToString(employees[_req].myHistory[i].id_sender);
-			str 	= strConcat(str, count);
-			str 	= strConcat(str, "|");
+			count = uint2str(employees[_req].myHistory[i].id_sender);
+			str = strConcat(str, count);
+			str = strConcat(str, "|");
 
-			count = uintToString(employees[_req].myHistory[i].core_type);
-			str 	= strConcat(str, count);
-			str 	= strConcat(str, "|");
+			count = uint2str(employees[_req].myHistory[i].core_type);
+			str = strConcat(str, count);
+			str = strConcat(str, "|");
 
-			str 	= strConcat(str, employees[_req].myHistory[i].description);
-			str 	= strConcat(str, ";");
+			str = strConcat(str, employees[_req].myHistory[i].description);
+			str = strConcat(str, ";");
 		}
 
 		return (str);
@@ -231,7 +234,7 @@ contract Onspot {
 				str = strConcat(str,employees[_req].myStock[i].name);
 				str = strConcat (str,"|");
 
-				count = uintToString(employees[_req].myStock[i].amount);
+				count = uint2str(employees[_req].myStock[i].amount);
 				str = strConcat(str,count);	
 			 	str = strConcat(str,";");
 			}
@@ -243,7 +246,7 @@ contract Onspot {
 		return employees[_req].count_myStock.length;
 	}
 
-	function getEmployee(address _addr) public returns(uint, string, uint, uint) {
+	function getEmployee(address _addr) constant returns(uint, string, uint, uint) {
 		return (employees[_addr].id, employees[_addr].name, employees[_addr].myWallet.onspot, employees[_addr].myWallet.ticket);
 	}
 
@@ -285,23 +288,6 @@ contract Onspot {
 		for (i = 0; i < _bd.length; i++) babcde[k++] = _bd[i];
 		for (i = 0; i < _be.length; i++) babcde[k++] = _be[i];
 		return string(babcde);
-	}
-	function uintToString(uint v) constant  returns(string str) {
-
-		uint maxlength = 100;
-		bytes memory reversed = new bytes(maxlength);
-		uint i = 0;
-		while (v != 0) {
-			uint remainder = v % 10;
-			v = v / 10;
-			reversed[i++] = byte(48 + remainder);
-		}
-		bytes memory s = new bytes(i + 1);
-
-		for (uint j = 0; j <= i; j++) {
-			s[j] = reversed[i - j];
-		}
-		str = string(s);
 	}
 
 	function compare(string _a, string _b) returns(int) {
@@ -349,5 +335,22 @@ contract Onspot {
 			return -1;
 		}
     }
+
+function uint2str(uint i) public returns (string){
+    if (i == 0) return "0";
+    uint j = i;
+    uint length;
+    while (j != 0){
+        length++;
+        j /= 10;
+    }
+    bytes memory bstr = new bytes(length);
+    uint k = length - 1;
+    while (i != 0){
+        bstr[k--] = byte(48 + i % 10);
+        i /= 10;
+    }
+    return string(bstr);
+}
 
 }

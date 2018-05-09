@@ -43,6 +43,7 @@ var tx      = express.Router();
 var sol	    = express.Router();
 var stock   = express.Router();
 var emp	    = express.Router();
+var utl    = express.Router();
 
 /****************************************************************
  ******** ACCOUNT 
@@ -254,11 +255,29 @@ stock.route('/update')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "update stock success!", "update stock fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "update stock successful!", "update stock fail!", whereIs))
                                 }
                         }
                 )
         })
+
+stock.route('/getitem')
+        .post((req ,res) => {
+                let whereIs = req.originalUrl;
+                myContract.getStockItem(
+                        req.body.id,
+                        {from : req.body.callerAddress},
+                        (error, res2) => {
+                                if(error) {
+                                        res.json(util.resLog(error.message, 0, whereIs));
+                                }else{
+                                        res.json(util.resSolLog(res2, "get item successful", "no item, something went wrong ?", whereIs))
+                                }
+                        }
+                )
+        })
+
+
 
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - EMPLOYEES
@@ -370,6 +389,7 @@ emp.route('/get')
                 )
         })  
 
+// clear the ticket to 0, what about onspot ?!? 
 emp.route('/clear')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -385,6 +405,29 @@ emp.route('/clear')
                         }
                 )
         })  
+
+/****************************************************************
+ ******** UTILITY / TEST SOME FUNCTION
+ *****************************************************************/
+
+
+utl.route('/uint')
+        .post((req ,res) => {
+                let whereIs = req.originalUrl;
+                myContract.uintToString(
+                        req.body.intx,
+                        {from : req.body.callerAddress},
+                        (error, res2) => {
+                                if(error) {
+                                        res.json(util.resLog(error.message, 0, whereIs));
+                                }else{
+                                        res.json(util.resSolLog(res2, "update stock successful!", "update stock fail!", whereIs))
+                                }
+                        }
+                )
+        })
+
+
 /* PATTERN *//*   
 sol.route('/onspot')
         .post((req ,res) => {
@@ -406,7 +449,8 @@ app.use('/acc', account);       /* All account request prefix with "/acc" */
 app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
 app.use('/sol', sol);           /* All smart contract/solidity job prefix with "/sol" */
 app.use('/sol/stock',   stock); 
-app.use('/sol/emp',     emp) 
+app.use('/sol/emp',     emp); 
+app.use('util/', utl);
 app.listen(port, (err) => {
         if (err) {
                 return console.log('Fail to intial server:', err);
