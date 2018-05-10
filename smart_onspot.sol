@@ -90,15 +90,16 @@ contract Onspot {
 
 	function getStockList() constant returns(string) {
 		uint num = countStocks();
+		if(num==0) return "0";
 		var str = "";
 		var id = "";
 		var amount = "";
 		var price = "";
 		bool isPass1Loop = false;
 
-		str = strConcat(str, "{");
+		str = strConcat(str, "[");
 		for (uint i = 0; i < num; i++) {
-			if(isPass1Loop) str = strConcat(str, ",");
+			if(isPass1Loop) str = strConcat(str, ", ");
 			str = strConcat(str, "{");
 
 			uint j = stock_list[i];
@@ -107,23 +108,24 @@ contract Onspot {
 			str = strConcat(str, id);
 
 			str = strConcat(str, ",");
-			str = strConcat(str, "name : ");
+			str = strConcat(str, "'name' : '");
 			str = strConcat(str, stocks[j].name);
+			str = strConcat(str, "'");
 			
 			str = strConcat(str, ",");
 			amount = uint2str(stocks[j].amount);
-			str = strConcat(str, "amount : ");
+			str = strConcat(str, "'amount' : ");
 			str = strConcat(str, amount);
 			
 			str = strConcat(str, ",");
 			price = uint2str(stocks[j].price);
-			str = strConcat(str, "price : ");
+			str = strConcat(str, "'price' : ");
 			str = strConcat(str, price);
 
 			str = strConcat(str, "}");
 			isPass1Loop = true;
 		}
-		str = strConcat(str, "}");
+		str = strConcat(str, "]");
 
 		return (str);
 	}
@@ -201,59 +203,63 @@ contract Onspot {
 
 	function getHistory(address _req) constant returns(string) {
 		uint num = employees[_req].count_myHistory;
+		if(num==0) return "0";
 		var str = "";
 		var count = "";
 		bool isPass1Loop = false;
 
-		str = strConcat(str, "{");
+		str = strConcat(str, "[ ");
 		for (uint i = 0; i < num; i++) {
-			if(isPass1Loop) str = strConcat(str, ",");
+			if(isPass1Loop) str = strConcat(str, ", ");
 			str = strConcat(str, "{");
 
 			count = uint2str(employees[_req].myHistory[i].id_sender);
-			str = strConcat(str, "id_sender : ");
+			str = strConcat(str, "\"id_sender\" : ");
 			str = strConcat(str, count);
 			
 			str = strConcat(str, ",");
 			count = uint2str(employees[_req].myHistory[i].core_type);
-			str = strConcat(str, "core_type : ");
+			str = strConcat(str, "\"core_type\" : ");
 			str = strConcat(str, count);
 
 			str = strConcat(str, ",");
-			str = strConcat(str, "description : ");
+			str = strConcat(str, "\"description\" : \"");
 			str = strConcat(str, employees[_req].myHistory[i].description);
+			str = strConcat(str, "\"");			
 
 			str = strConcat(str, "}");
 			isPass1Loop = true;
 		}
-		str = strConcat(str, "}");
+		str = strConcat(str, " ]");
 		return (str);
 	}
 
 	function getEmployeeRedeem(address _req) constant returns(string) {
 		uint num = countStocks();
+		if(num==0) return "0";
 		var str = "";
 		var count = "";
 		bool isPass1Loop = false;
-		str = strConcat(str, "{");
+		str = strConcat(str, "[ ");
 		for (uint i = 1; i <= num; i++) {
 			if (employees[_req].myStock[i].amount != 0) {
-				if(isPass1Loop) str = strConcat(str, ",");
+				if(isPass1Loop) str = strConcat(str, ", ");
 				str = strConcat(str, "{");
 
-				str = strConcat(str, "name : ");
+				str = strConcat(str, "\"name\" : \"");
 				str = strConcat(str, employees[_req].myStock[i].name);
+				str = strConcat(str, "\"");
 
 				str = strConcat(str, ",");
 				count = uint2str(employees[_req].myStock[i].amount);
-				str = strConcat(str, "amount : ");
+				str = strConcat(str, "\"amount\" : ");
 				str = strConcat(str, count);
 
 				str = strConcat(str, "}");
 				isPass1Loop = true;
 			}
 		}
-		str = strConcat(str, "}");
+		str = strConcat(str, " ]");
 		return (str);
 	}
 

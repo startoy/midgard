@@ -76,9 +76,9 @@ account.route('/create')
                 request.get(options, (err, res2, body) => {
                         if (!err && res2.statusCode == 200) {
                                 if (pipe.addAccount(JSON.parse(body))) {
-                                        res.json(util.resLog("account added!", 1, whereIs, JSON.parse(body)));
+                                        res.json(util.resLog("The account has been add to list", 1, whereIs, JSON.parse(body)));
                                 } else {
-                                        res.json(util.resLog("failed to add this account.", 0, whereIs));
+                                        res.json(util.resLog("The account has not been add", 0, whereIs));
                                 }
                         } else {
                                 res.json(util.resLog(err.message, 0, whereIs));
@@ -155,7 +155,6 @@ sol.route('/cnf-onspot')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                util.serverLog("config onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -175,7 +174,6 @@ sol.route('/cnf-adjtime')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                util.serverLog("config new onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -224,19 +222,16 @@ stock.route('/delete')
                 )
         })
 
-/* FIXME: can't use this func ?!? */
 stock.route('/get')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
                 myContract.getStockList(
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("getStockList : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get stock success!", "get stock fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get stocks succesful!", "getting stock fail! is stock has a item ?", whereIs))
                                 }
                         }
                 )
@@ -312,6 +307,8 @@ emp.route('/give')
                         Math.floor(Date.now() / 1000),
                         {from : req.body.callerAddress},
                         (error, res2) => {
+				console.log("res:"+res2);
+				console.log("err:"+error);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{

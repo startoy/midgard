@@ -18,15 +18,19 @@
 	   *strict msg and status have to return
         */
 
-        exports.resLog = (msg, statusNum, whereIs, body) => {
+        exports.resLog = (msg, statusNum, whereIs, bodyPa) => {
                 //callback && callback();   // if have callback, call it
                 if (!msg) msg = "calling success";
                 if (!this.isNumber(statusNum) && statusNum != 0) statusNum = 1;
-                this.serverLog(msg, whereIs);
+		let logLevel = 1 ; // 1 = INFO, 0 = ERROR
+		if (statusNum == 0) logLevel = 0;
+		this.serverLog(logLevel, msg, whereIs);
+	
+		let body = eval(bodyPa);
                 return {
                         message: msg,
                         status: statusNum,
-                        body
+			body : body
                 };
         }
 
@@ -65,11 +69,20 @@
                 }
         }
 
-        exports.serverLog = (msg, WhereIs) => {
+        exports.serverLog = (logLevel, msg, WhereIs) => {
                 //if(unixTimeFlag) console.log("[Unix:"+Math.floor(Date.now() / 1000)+"]");
 		let d = new Date(new Date().getTime() + 7*60*60*1000); // 7 hours later
-                //console.log("SERVER_LOG:[ ("+d.getDate()+"/"+(d.getMonth()+1)+"/"+d.getFullYear()+" "+d.get+") on (" + WhereIs +") : " + msg + "]");
-                console.log("SERVER_LOG:[("+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+") on (" + WhereIs +") : " + msg + "]");
+		/*// string pad left
+		var padding = Array(256).join(' ');
+		pad(padding, 3213, true);
+
+		// number pad left, stick to right use false
+		pad('00000000000', 123, true); */
+		let msgLv = logLevel ? "[INFO]" : "[ERROR]";
+		let tempmsg = Array(21).join(' ');
+		let printmsg = "[SERVER_LOG]"+msgLv+"["+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+"] on [" + this.pad(tempmsg, WhereIs, true) +"] : " + msg + "";
+		console.log(printmsg);
+                //console.log("SERVER_LOG:"+msgLv+"[("+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+") on (" + WhereIs +") : " + msg + "]");
         }
 /*
 new Date().toLocaleTimeString(); // 11:18:48 AM
@@ -85,3 +98,13 @@ new Date().toLocaleString(); // 11/16/2015, 11:18:48 PM
                         return 1;
                 return 0;
         }
+
+	exports.pad = (pad, str, padLeft) => {
+  		if (typeof str === 'undefined') 
+    			return pad;
+  		if (padLeft) {
+    			return (pad + str).slice(-pad.length);
+  		} else {
+    			return (str + pad).substring(0, pad.length);
+  		}
+	}
