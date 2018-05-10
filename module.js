@@ -78,10 +78,10 @@
 
 		// number pad left, stick to right use false
 		pad('00000000000', 123, true); */
-		let msgLv = logLevel ? "[INFO]" : "[ERROR]";
-		let tempmsg = Array(21).join(' ');
+		let msgLv = logLevel ? "[INFO ]" : "[ERROR]";
+		let tempmsg = Array(19).join(' ');
 		let printmsg = "[SERVER_LOG]"+msgLv+"["+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+"] on [" + this.pad(tempmsg, WhereIs, true) +"] : " + msg + "";
-		console.log(printmsg);
+		console.log("%s", printmsg);
                 //console.log("SERVER_LOG:"+msgLv+"[("+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+") on (" + WhereIs +") : " + msg + "]");
         }
 /*

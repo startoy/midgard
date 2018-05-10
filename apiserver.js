@@ -6,6 +6,13 @@ const express           = require('express')                          /* server 
 const request           = require('request')                          /* make a http request to specific url */
 const bodyParser        = require('body-parser');
 
+// mondb
+const mongoose 		= require('mongoose');
+const config 		= require('./config');
+// Schema ตั่งต่าง
+const User		= require('./apps/models/user');
+mongoose.connect(config.database);
+
 /* import module from 'module'; */
 const util 		= require('./module');
 
@@ -44,6 +51,7 @@ var sol	    = express.Router();
 var stock   = express.Router();
 var emp	    = express.Router();
 var utl     = express.Router();
+var mondb   = express.Router();
 
 /****************************************************************
  ******** ACCOUNT 
@@ -53,12 +61,6 @@ var utl     = express.Router();
                 console.log("Entering the account acc -> next()");
                 next();
         }); */
-
-account.get('/', (req, res) => {
-        res.json({
-                message: "this is first page of api"
-        });
-});
 
 account.route('/gets')
         .get((req, res) => {
@@ -75,8 +77,20 @@ account.route('/create')
                 };
                 request.get(options, (err, res2, body) => {
                         if (!err && res2.statusCode == 200) {
-                                if (pipe.addAccount(JSON.parse(body))) {
-                                        res.json(util.resLog("The account has been add to list", 1, whereIs, JSON.parse(body)));
+				let userBody = JSON.parse(body);
+				/* TODO: adjust this */
+                                if (pipe.addAccount(userBody)) {
+					var userCreate = new User({
+						emp_id : req.body.emp_id,
+						address : userBody.address,
+						pubkey : userBody.pubKey,
+						prikey : userBody.priKey
+					});
+					userCreate.save((Mon_err)=>{
+						if (Mon_err) res.json(util.resLog("The account has not been add", 0, whereIs));
+
+						res.json(util.resLog("The account has been add to list", 1, whereIs, userBody));
+					});
                                 } else {
                                         res.json(util.resLog("The account has not been add", 0, whereIs));
                                 }
@@ -85,6 +99,41 @@ account.route('/create')
                         }
                 });
         });
+
+mondb.route('/acc')
+	.get((req, res) => {
+		let whereIs = req.originalUrl;
+		User.find((err, user) => {
+			if(err) res.json(util.resLog("err : ",0, whereIs, err));
+			if(!user || user == ""){
+				res.json(util.resLog("err : no user provided", 0, whereIs));
+			}else if(user && user != ""){
+				util.serverLog(1,user,whereIs);
+				res.json(util.resLog("user found !", 1, whereIs, user));
+			}
+		});
+	});
+
+/* map address to app layer  */
+mondb.route('/setup')
+        .get((req, res) => {
+                let whereIs = req.originalUrl;
+                User.find().stream()
+		.on('data', (doc) => {
+			var obj = { 	address : doc.address,
+			    		pubkey : doc.pubkey,
+			    		prikey : doc.prikey
+				}
+			pipe.addAccountApp(obj);
+		})
+		.on('error', (err)=> {
+			res.json(util.resLog("err : ", 0, whereIs, err));
+		})
+		.on('end', () => {
+			res.json(util.resLog("executed!, please check manually", 1, whereIs));
+		}); 
+        });
+
 
 account.route('/generate')
         .get((req, res) => {
@@ -101,7 +150,7 @@ account.route('/generate')
                                 let newDataObj = {
                                         address: address,
                                         pubKey: pub,
-                                        privKey: pri
+                                        priKey: pri
                                 };
                                 res.json(newDataObj);
                         } else {
@@ -445,9 +494,10 @@ sol.route('/onspot')
 app.use('/acc', account);       /* All account request prefix with "/acc" */
 app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
 app.use('/sol', sol);           /* All smart contract/solidity job prefix with "/sol" */
-app.use('/sol/stock',   stock); 
-app.use('/sol/emp',     emp); 
-app.use('util/', utl);
+app.use('/sol/stock', stock); 
+app.use('/sol/emp', emp); 
+app.use('/util', utl);
+app.use('/db', mondb);
 app.listen(port, (err) => {
         if (err) {
                 return console.log('Fail to intial server:', err);
