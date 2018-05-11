@@ -55,7 +55,7 @@ exports.resSolLog = (statusReturn, successMsg, failMsg, whereIs) => {
         }
 }
 
-exports.serverLog = (logLevel, msg, WhereIs) => {
+exports.serverLog = (logLevel, msg, whereIs) => {
         //if(unixTimeFlag) console.log("[Unix:"+Math.floor(Date.now() / 1000)+"]");
         let d = new Date(new Date().getTime() + 7*60*60*1000); // 7 hours later
         /*// string pad left
@@ -64,10 +64,11 @@ exports.serverLog = (logLevel, msg, WhereIs) => {
 
         // number pad left, stick to right use false
         pad('00000000000', 123, true); */
-        let msgLv = logLevel ? "[INFO ]" : "[ERROR]";
-        let tempmsg = Array(19).join(' ');
-        let printmsg = "[SERVER_LOG]"+msgLv+"["+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+"] on [" + this.pad(tempmsg, WhereIs, true) +"] : " + msg + "";
-        console.log("%s", printmsg);
+        let msgLv = logLevel ? "INFO" : "ERROR";
+        // let tempmsg = Array(16).join(' ');
+        // let printmsg = "[SERVER_LOG]"+msgLv+"["+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+"] on [" + this.pad(tempmsg, whereIs, true) +"] : " + msg + "";
+        console.log("[SERVER_LOG][%s][%s %s][%s]:%s", msgLv, d.toLocaleDateString(), d.toLocaleTimeString()
+							, whereIs, msg);
         //console.log("SERVER_LOG:"+msgLv+"[("+ d.toLocaleDateString()+" "+d.toLocaleTimeString()+") on (" + WhereIs +") : " + msg + "]");
 }
 /*
@@ -77,12 +78,14 @@ new Date().toLocaleString(); // 11/16/2015, 11:18:48 PM
 */
 
 /* ------------------------ MONGODB --------------------------- */
+
 const User		= require('./apps/models/user');
 
 // insert
 exports.addAccountToDB = (emp_id, account, adminFlag) => {
-        if(adminFlag){    
-                let user = new User({
+        return new Promise((resolve, reject) => {
+	    if(adminFlag){    
+                var user = new User({
                         emp_id : emp_id,
                         address : account.address,
                         pubkey : account.pubKey,
@@ -90,47 +93,66 @@ exports.addAccountToDB = (emp_id, account, adminFlag) => {
                         active : true,
                         admin : true
                 });
-        }else{
-                let user = new User({
+            }else{
+                var user = new User({
                         emp_id : emp_id,
                         address : account.address,
                         pubkey : account.pubKey,
                         prikey : account.priKey,
                         active : true
                 });
-        }
-        user.save((err)=>{
-                if (err) return false;
-                return true;
-        });
+            }  
+        	user.save((err)=>{
+                	if (err) reject(err);
+                	resolve(true);
+        	});
+	})
 }
 
 //update
-exports.updateAccountFromDB = (emp_id, updateObj) => {
-        let query = { emp_id : emp_id };
-        User.findOneAndUpdate(query, { updateObj }, (err) => {
-                if(err) return false;
-                return true;
-        })
+exports.updateAccountFromDB = (emp_id, updateObj, multiFlag) => {
+        return new Promise((resolve, reject) => {
+		let query = { emp_id : emp_id };
+                User.update(query, updateObj, {multi:multiFlag}, (err)=>{
+			if(err) reject(err);
+			resolve(true);
+		})
+	})
 }
 
+
+
 //delete : address should not delete ? so change active status instead
-exports.deleteAccountFromDB = (emp_id, updateObj) => {
-        let query = { emp_id : emp_id };
-        // updateObj should be { active : false }
-        User.findOneAndUpdate(query, { updateObj }, (err) => {
-                if(err) return false;
-                return true;
-        })
+exports.deleteAccountFromDB = (emp_id) => {
+	return new Promise((resolve, reject) => {
+          let query = { emp_id : emp_id };
+	  let updateObj = { active : false }
+          // updateObj should be { active : false }
+          User.findOneAndUpdate(query, { updateObj }, (err) => {
+                if(err) reject(err);
+                resolve(true);
+          })
+	})
 }
 
 //query
 exports.queryAccountFromDB = (query) => {
-        User.find(query,(err, user) => {
-                if(err) return err;
-                if(!user || user == "") return "err : no user provided";
-                return user;
+	return new Promise((resolve, reject) => {
+	    User.find(query,(err, user) => {
+                if(err) reject(err);
+                if(!user || user == "") reject("no user provided.");
+                resolve(user);
         });
+   })
+}
+
+exports.clearDataFromDB = () => {
+	return new Promise((resolve, reject) => {
+		User.remove({}, err => {
+			if(err||err!=null) reject(err);
+			return resolve(true);
+		})
+	})
 }
 
 

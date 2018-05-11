@@ -50,7 +50,7 @@ var tx      = express.Router();
 var sol	    = express.Router();
 var stock   = express.Router();
 var emp	    = express.Router();
-var utl     = express.Router();
+/*var utl     = express.Router();*/
 var mondb   = express.Router();
 
 /****************************************************************
@@ -76,11 +76,13 @@ account.route('/create')
                         if (!err && res2.statusCode == 200) {
                                 let userBody = JSON.parse(body);
                                 let emp_id = req.body.emp_id;
-                                if (pipe.addAccount(userBody) && util.addAccountToDB(emp_id, userBody)) {
+				util.addAccountToDB(emp_id, userBody).then(pipe.addAccount(userBody))
+				.then(()=>{
                                         res.json(util.resLog("The account has been added to list", 1, whereIs, userBody));
-                                } else {
-                                        res.json(util.resLog("The account has not been added", 0, whereIs));
-                                }
+				})
+				.catch((error)=>{
+					res.json(util.resLog(error, 0, whereIs));
+				})
                         } else {
                                 res.json(util.resLog(err.message, 0, whereIs));
                         }
@@ -411,14 +413,57 @@ emp.route('/clear')
  *****************************************************************/
 
         /* restrict admin */
-/* get accounts from db */
+/* query accounts from db */
 mondb.route('/accounts')
 	.get((req, res) => {
                 let whereIs = req.originalUrl;
-                let query = {};
-                let result = util.queryAccountFromDB(query);
-                res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));                
+                util.queryAccountFromDB()
+                .then(result => {
+                        res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));
+                })
+                .catch( (err)=>{
+                        res.json(util.resLog("error : " + err, 0, whereIs));
+                })
+        })
+
+	.post((req, res) => {
+                let whereIs = req.originalUrl;
+                let query = {emp_id : req.body.emp_id};
+		util.queryAccountFromDB(query)
+		.then(result => {
+                	res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));                
+		})
+		.catch( (err)=>{
+			res.json(util.resLog("error : " + err, 0, whereIs));
+		})
 	});
+
+/*
+ 
+DO NOT USE, DEV ONLY 
+ since address on chain should not be deletefrom db cuz  we can't find it back (or don't know how) so just find and update that account field to not active instead
+
+always execute success -> no return false or error 
+TODO: fix to use from module
+*/
+mondb.route('/cleardata')
+	.delete((req, res) => {
+		let whereIs = req.originalUrl;
+		User.remove({}, (err)=>{
+			if(err) res.json(util.resLog("error on clear data?", 0, whereIs, err));
+			res.json(util.resLog("clear data from database successful!", 1, whereIs));
+		})
+		/*
+		util.clearDataFromDB()
+		.then( ()=> {
+			res.json(util.resSolLog(result, "clear data from database successful!", "something went wrong on clearing data from database!", whereIs));
+		})
+		.catch( (err) => {
+			res.json(util.resLog("error on clear data?", 0, whereIs, err));
+		})
+		*/
+
+	})
 
 /* map each address from db to app layer  */
 mondb.route('/setup')
@@ -446,12 +491,13 @@ mondb.route('/setup')
  *      - foreach addr in db -> clear  
  *      - stocks should store in db too ?!?
  *      - password separate from hr api
+ *      - insert update delete function
  */
 
 /****************************************************************
  ******** UTILITY / TEST SOME FUNCTION
  *****************************************************************/
-
+/*
 utl.route('/uint')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -467,7 +513,7 @@ utl.route('/uint')
                         }
                 )
         })
-
+*/
 /* PATTERN *//*   
 sol.route('/onspot')
         .post((req ,res) => {
@@ -490,7 +536,7 @@ app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
 app.use('/sol', sol);           /* All smart contract/solidity job prefix with "/sol" */
 app.use('/sol/stock', stock); 
 app.use('/sol/emp', emp); 
-app.use('/util', utl);
+/*app.use('/util', utl);*/
 app.use('/db', mondb);
 app.listen(port, (err) => {
         if (err) {
