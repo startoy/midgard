@@ -100,40 +100,31 @@ account.route('/create')
                 });
         });
 
-mondb.route('/acc')
-	.get((req, res) => {
-		let whereIs = req.originalUrl;
-		User.find((err, user) => {
-			if(err) res.json(util.resLog("err : ",0, whereIs, err));
-			if(!user || user == ""){
-				res.json(util.resLog("err : no user provided", 0, whereIs));
-			}else if(user && user != ""){
-				util.serverLog(1,user,whereIs);
-				res.json(util.resLog("user found !", 1, whereIs, user));
-			}
-		});
-	});
-
-/* map address to app layer  */
-mondb.route('/setup')
-        .get((req, res) => {
+account.route('/createfn')
+        .post((req, res) => {
                 let whereIs = req.originalUrl;
-                User.find().stream()
-		.on('data', (doc) => {
-			var obj = { 	address : doc.address,
-			    		pubkey : doc.pubkey,
-			    		prikey : doc.prikey
-				}
-			pipe.addAccountApp(obj);
-		})
-		.on('error', (err)=> {
-			res.json(util.resLog("err : ", 0, whereIs, err));
-		})
-		.on('end', () => {
-			res.json(util.resLog("executed!, please check manually", 1, whereIs));
-		}); 
+                //call create account
+                let options = {
+                        url: _url_acc + '/generate'
+                };
+                request.get(options, (err, res2, body) => {
+                        if (!err && res2.statusCode == 200) {
+                                let userBody = JSON.parse(body);
+                                let emp_id = req.body.emp_id;
+                                addAccountToDB(emp_id, userBody).then(pipe.addAccount(userBody)).then( ()=> {
+                                        res.json(util.resLog("The account has been add to list", 1, whereIs, userBody));
+                                });
+                                /* if (pipe.addAccount(userBody)) {
+                                        res.json(util.resLog("The account has been add to list", 1, whereIs, userBody));
+					
+                                } else {
+                                        res.json(util.resLog("The account has not been add", 0, whereIs));
+                                } */
+                        } else {
+                                res.json(util.resLog(err.message, 0, whereIs));
+                        }
+                });
         });
-
 
 account.route('/generate')
         .get((req, res) => {
@@ -235,7 +226,7 @@ sol.route('/cnf-adjtime')
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - STOCK
  *****************************************************************/
-
+        /* restrict admin */
 stock.route('/add')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -385,7 +376,7 @@ emp.route('/redeem')
                 )
         })
 
-/* FIXME: can't use this */
+
 emp.route('/history')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -433,8 +424,9 @@ emp.route('/get')
                                 }
                         }
                 )
-        })  
+        }) 
 
+        /* restrict admin */
 // clear the ticket to 0, what about onspot ?!? 
 emp.route('/clear')
         .post((req ,res) => {
@@ -451,6 +443,52 @@ emp.route('/clear')
                         }
                 )
         })  
+
+/****************************************************************
+ ******** MONGO DB
+ *****************************************************************/
+        /* restrict admin */    
+/* get accounts from db */
+mondb.route('/accounts')
+.get((req, res) => {
+        let whereIs = req.originalUrl;
+        User.find((err, user) => {
+                if(err) res.json(util.resLog("err : ",0, whereIs, err));
+                if(!user || user == ""){
+                        res.json(util.resLog("err : no user provided", 0, whereIs));
+                }else if(user && user != ""){
+                        util.serverLog(1,user,whereIs);
+                        res.json(util.resLog("user found !", 1, whereIs, user));
+                }
+        });
+});
+
+/* map each address to app layer when restart server  */
+mondb.route('/setup')
+        .get((req, res) => {
+                let whereIs = req.originalUrl;
+                User.find().stream()
+		.on('data', (doc) => {
+			var obj = { 	
+                                        address : doc.address,
+			    		pubkey : doc.pubkey,
+			    		prikey : doc.prikey
+				}
+			pipe.addAccountApp(obj);
+		})
+		.on('error', (err)=> {
+			res.json(util.resLog("error on streaming data to setup", 0, whereIs, err));
+		})
+		.on('end', () => {
+			res.json(util.resLog("executed!, please check result manually", 1, whereIs));
+		}); 
+        });
+
+/* ------------------------- MORE FUNCTION -------------------------
+ *      - foreach addr in db -> clear  
+ *      - stocks should store in db too ?!?
+ *      - password separate from hr api
+ */
 
 /****************************************************************
  ******** UTILITY / TEST SOME FUNCTION
@@ -490,6 +528,34 @@ sol.route('/onspot')
                 )
         })
  */
+
+ // insert
+function addAccountToDB(emp_id, account, adminFlag) {
+        return new Promise( (fullfill, reject) => {
+                if(adminFlag){    
+                        let user = new User({
+                                emp_id : emp_id,
+                                address : account.address,
+                                pubkey : account.pubKey,
+                                prikey : account.priKey,
+                                active : true,
+                                admin : true
+                        });
+                }else{
+                        let user = new User({
+                                emp_id : emp_id,
+                                address : account.address,
+                                pubkey : account.pubKey,
+                                prikey : account.priKey,
+                                active : true
+                        });
+                }
+                user.save((err)=>{
+                        if (err) reject(err);
+                        return fulfill(true);
+                });
+        })
+}
 
 app.use('/acc', account);       /* All account request prefix with "/acc" */
 app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
