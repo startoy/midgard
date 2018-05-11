@@ -71,28 +71,15 @@ account.route('/gets')
 account.route('/create')
         .post((req, res) => {
                 let whereIs = req.originalUrl;
-                //call create account
-                let options = {
-                        url: _url_acc + '/generate'
-                };
+                let options = { url: _url_acc + '/generate' };
                 request.get(options, (err, res2, body) => {
                         if (!err && res2.statusCode == 200) {
-				let userBody = JSON.parse(body);
-				/* TODO: adjust this */
-                                if (pipe.addAccount(userBody)) {
-					var userCreate = new User({
-						emp_id : req.body.emp_id,
-						address : userBody.address,
-						pubkey : userBody.pubKey,
-						prikey : userBody.priKey
-					});
-					userCreate.save((Mon_err)=>{
-						if (Mon_err) res.json(util.resLog("The account has not been add", 0, whereIs));
-
-						res.json(util.resLog("The account has been add to list", 1, whereIs, userBody));
-					});
+                                let userBody = JSON.parse(body);
+                                let emp_id = req.body.emp_id;
+                                if (pipe.addAccount(userBody) && util.addAccountToDB(emp_id, userBody)) {
+                                        res.json(util.resLog("The account has been added to list", 1, whereIs, userBody));
                                 } else {
-                                        res.json(util.resLog("The account has not been add", 0, whereIs));
+                                        res.json(util.resLog("The account has not been added", 0, whereIs));
                                 }
                         } else {
                                 res.json(util.resLog(err.message, 0, whereIs));
@@ -100,41 +87,7 @@ account.route('/create')
                 });
         });
 
-mondb.route('/acc')
-	.get((req, res) => {
-		let whereIs = req.originalUrl;
-		User.find((err, user) => {
-			if(err) res.json(util.resLog("err : ",0, whereIs, err));
-			if(!user || user == ""){
-				res.json(util.resLog("err : no user provided", 0, whereIs));
-			}else if(user && user != ""){
-				util.serverLog(1,user,whereIs);
-				res.json(util.resLog("user found !", 1, whereIs, user));
-			}
-		});
-	});
-
-/* map address to app layer  */
-mondb.route('/setup')
-        .get((req, res) => {
-                let whereIs = req.originalUrl;
-                User.find().stream()
-		.on('data', (doc) => {
-			var obj = { 	address : doc.address,
-			    		pubkey : doc.pubkey,
-			    		prikey : doc.prikey
-				}
-			pipe.addAccountApp(obj);
-		})
-		.on('error', (err)=> {
-			res.json(util.resLog("err : ", 0, whereIs, err));
-		})
-		.on('end', () => {
-			res.json(util.resLog("executed!, please check manually", 1, whereIs));
-		}); 
-        });
-
-
+        /* restrict admin */
 account.route('/generate')
         .get((req, res) => {
                 let whereIs = req.originalUrl;
@@ -168,6 +121,7 @@ tx.get('/', (req, res) => {
         res.json(util.resLog("this is first page of transaction api", 0));
 });
 
+        /* restrict admin */
 tx.route('/sendtoken')
         .get((req, res) => {
                 res.json(util.resLog("use POST method to send token", 0));
@@ -194,6 +148,7 @@ sol.get('/', (req, res) => {
         res.json(util.resLog("this is first page of smart contract api", 1));
 });
 
+        /* restrict admin */
 sol.route('/cnf-onspot')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -213,6 +168,7 @@ sol.route('/cnf-onspot')
                 )
         })
 
+                /* restrict admin */
 sol.route('/cnf-adjtime')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -235,7 +191,7 @@ sol.route('/cnf-adjtime')
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - STOCK
  *****************************************************************/
-
+        /* restrict admin All */
 stock.route('/add')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -326,7 +282,7 @@ stock.route('/getitem')
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - EMPLOYEES
  *****************************************************************/
-
+        /* restrict admin */
 emp.route('/create')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -356,12 +312,10 @@ emp.route('/give')
                         Math.floor(Date.now() / 1000),
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("res:"+res2);
-				console.log("err:"+error);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "give onspot success!", "give onspot fail", whereIs))
+                                        res.json(util.resSolLog(res2, "give onspot successful!", "give onspot fail", whereIs))
                                 }
                         }
                 )
@@ -379,13 +333,12 @@ emp.route('/redeem')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "redeem gift successful!", "redeem gift fail!", whereIs))
                                 }
                         }
                 )
         })
 
-/* FIXME: can't use this */
 emp.route('/history')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -396,7 +349,7 @@ emp.route('/history')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get history success!", "get history fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get history successful!", "get history fail!", whereIs))
                                 }
                         }
                 )
@@ -413,7 +366,7 @@ emp.route('/empredeem')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get emp redeem successful!", "get emp redeem fail!", whereIs))
                                 }
                         }
                 )
@@ -429,12 +382,13 @@ emp.route('/get')
                                 if(error) {
                                         res.send(util.resLog(error.message, 0, whereIs)); 
 				}else{
-                                        res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get emp info successful!", "get emp info fail!", whereIs))
                                 }
                         }
                 )
         })  
 
+        /* restrict admin */
 // clear the ticket to 0, what about onspot ?!? 
 emp.route('/clear')
         .post((req ,res) => {
@@ -446,16 +400,57 @@ emp.route('/clear')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "delete emp data successful!", "delete emp data fail!", whereIs))
                                 }
                         }
                 )
         })  
 
 /****************************************************************
- ******** UTILITY / TEST SOME FUNCTION
+ ******** MONGODB - MONGOOSE
  *****************************************************************/
 
+        /* restrict admin */
+/* get accounts from db */
+mondb.route('/accounts')
+	.get((req, res) => {
+                let whereIs = req.originalUrl;
+                let query = {};
+                let result = util.queryAccountFromDB(query);
+                res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));                
+	});
+
+/* map each address from db to app layer  */
+mondb.route('/setup')
+        .get((req, res) => {
+                let whereIs = req.originalUrl;
+                User.find().stream()
+		.on('data', (doc) => {
+			var obj = { 	
+                                        address : doc.address,
+			    		pubkey : doc.pubkey,
+			    		prikey : doc.prikey
+				}
+			pipe.addAccountApp(obj);
+		})
+		.on('error', (err)=> {
+			res.json(util.resLog("error on setup accounts", 0, whereIs, err));
+		})
+		.on('end', () => {
+			res.json(util.resLog("executed!, please check manually", 1, whereIs));
+		}); 
+        });
+
+
+/* ------------------------- MORE FUNCTION -------------------------
+ *      - foreach addr in db -> clear  
+ *      - stocks should store in db too ?!?
+ *      - password separate from hr api
+ */
+
+/****************************************************************
+ ******** UTILITY / TEST SOME FUNCTION
+ *****************************************************************/
 
 utl.route('/uint')
         .post((req ,res) => {
@@ -472,7 +467,6 @@ utl.route('/uint')
                         }
                 )
         })
-
 
 /* PATTERN *//*   
 sol.route('/onspot')
