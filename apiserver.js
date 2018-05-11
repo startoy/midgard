@@ -6,6 +6,13 @@ const express           = require('express')                          /* server 
 const request           = require('request')                          /* make a http request to specific url */
 const bodyParser        = require('body-parser');
 
+// mondb
+const mongoose 		= require('mongoose');
+const config 		= require('./config');
+// Schema ตั่งต่าง
+const User		= require('./apps/models/user');
+mongoose.connect(config.database);
+
 /* import module from 'module'; */
 const util 		= require('./module');
 
@@ -43,6 +50,8 @@ var tx      = express.Router();
 var sol	    = express.Router();
 var stock   = express.Router();
 var emp	    = express.Router();
+/*var utl     = express.Router();*/
+var mondb   = express.Router();
 
 /****************************************************************
  ******** ACCOUNT 
@@ -53,12 +62,6 @@ var emp	    = express.Router();
                 next();
         }); */
 
-account.get('/', (req, res) => {
-        res.json({
-                message: "this is first page of api"
-        });
-});
-
 account.route('/gets')
         .get((req, res) => {
 
@@ -68,23 +71,25 @@ account.route('/gets')
 account.route('/create')
         .post((req, res) => {
                 let whereIs = req.originalUrl;
-                //call create account
-                let options = {
-                        url: _url_acc + '/generate'
-                };
+                let options = { url: _url_acc + '/generate' };
                 request.get(options, (err, res2, body) => {
                         if (!err && res2.statusCode == 200) {
-                                if (pipe.addAccount(JSON.parse(body))) {
-                                        res.json(util.resLog("account added!", 1, whereIs, JSON.parse(body)));
-                                } else {
-                                        res.json(util.resLog("failed to add this account.", 0, whereIs));
-                                }
+                                let userBody = JSON.parse(body);
+                                let emp_id = req.body.emp_id;
+				util.addAccountToDB(emp_id, userBody).then(pipe.addAccount(userBody))
+				.then(()=>{
+                                        res.json(util.resLog("The account has been added to list", 1, whereIs, userBody));
+				})
+				.catch((error)=>{
+					res.json(util.resLog(error, 0, whereIs));
+				})
                         } else {
                                 res.json(util.resLog(err.message, 0, whereIs));
                         }
                 });
         });
 
+        /* restrict admin */
 account.route('/generate')
         .get((req, res) => {
                 let whereIs = req.originalUrl;
@@ -100,7 +105,7 @@ account.route('/generate')
                                 let newDataObj = {
                                         address: address,
                                         pubKey: pub,
-                                        privKey: pri
+                                        priKey: pri
                                 };
                                 res.json(newDataObj);
                         } else {
@@ -118,6 +123,7 @@ tx.get('/', (req, res) => {
         res.json(util.resLog("this is first page of transaction api", 0));
 });
 
+        /* restrict admin */
 tx.route('/sendtoken')
         .get((req, res) => {
                 res.json(util.resLog("use POST method to send token", 0));
@@ -144,6 +150,7 @@ sol.get('/', (req, res) => {
         res.json(util.resLog("this is first page of smart contract api", 1));
 });
 
+        /* restrict admin */
 sol.route('/cnf-onspot')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -154,7 +161,6 @@ sol.route('/cnf-onspot')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                util.serverLog("config onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -164,6 +170,7 @@ sol.route('/cnf-onspot')
                 )
         })
 
+                /* restrict admin */
 sol.route('/cnf-adjtime')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -174,7 +181,6 @@ sol.route('/cnf-adjtime')
                         req.body.endRedeemTime,
                         {from : req.body.callerAddress},
                         (error, res2) => {
-                                util.serverLog("config new onspot time...", whereIs);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
@@ -187,7 +193,7 @@ sol.route('/cnf-adjtime')
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - STOCK
  *****************************************************************/
-
+        /* restrict admin All */
 stock.route('/add')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -223,19 +229,16 @@ stock.route('/delete')
                 )
         })
 
-/* FIXME: can't use this func ?!? */
 stock.route('/get')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
                 myContract.getStockList(
                         {from : req.body.callerAddress},
                         (error, res2) => {
-				console.log("getStockList : " + res2);
-                                console.log("error : " + error);
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get stock success!", "get stock fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get stocks succesful!", "getting stock fail! is stock has a item ?", whereIs))
                                 }
                         }
                 )
@@ -254,16 +257,34 @@ stock.route('/update')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "update stock success!", "update stock fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "update stock successful!", "update stock fail!", whereIs))
                                 }
                         }
                 )
         })
 
+stock.route('/getitem')
+        .post((req ,res) => {
+                let whereIs = req.originalUrl;
+                myContract.getStockItem(
+                        req.body.id,
+                        {from : req.body.callerAddress},
+                        (error, res2) => {
+                                if(error) {
+                                        res.json(util.resLog(error.message, 0, whereIs));
+                                }else{
+                                        res.json(util.resSolLog(res2, "get item successful", "no item, something went wrong ?", whereIs))
+                                }
+                        }
+                )
+        })
+
+
+
 /****************************************************************
  ******** SMART CONTRACT / SOLIDITY - EMPLOYEES
  *****************************************************************/
-
+        /* restrict admin */
 emp.route('/create')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -296,7 +317,7 @@ emp.route('/give')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "give onspot success!", "give onspot fail", whereIs))
+                                        res.json(util.resSolLog(res2, "give onspot successful!", "give onspot fail", whereIs))
                                 }
                         }
                 )
@@ -314,13 +335,12 @@ emp.route('/redeem')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "redeem gift success!", "redeem gift fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "redeem gift successful!", "redeem gift fail!", whereIs))
                                 }
                         }
                 )
         })
 
-/* FIXME: can't use this */
 emp.route('/history')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -331,7 +351,7 @@ emp.route('/history')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get history success!", "get history fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get history successful!", "get history fail!", whereIs))
                                 }
                         }
                 )
@@ -348,7 +368,7 @@ emp.route('/empredeem')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "get emp redeem success!", "get emp redeem fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get emp redeem successful!", "get emp redeem fail!", whereIs))
                                 }
                         }
                 )
@@ -364,12 +384,14 @@ emp.route('/get')
                                 if(error) {
                                         res.send(util.resLog(error.message, 0, whereIs)); 
 				}else{
-                                        res.json(util.resSolLog(res2, "get emp info success!", "get emp info fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "get emp info successful!", "get emp info fail!", whereIs))
                                 }
                         }
                 )
         })  
 
+        /* restrict admin */
+// clear the ticket to 0, what about onspot ?!? 
 emp.route('/clear')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;
@@ -380,11 +402,118 @@ emp.route('/clear')
                                 if(error) {
                                         res.json(util.resLog(error.message, 0, whereIs));
                                 }else{
-                                        res.json(util.resSolLog(res2, "delete emp data success!", "delete emp data fail!", whereIs))
+                                        res.json(util.resSolLog(res2, "delete emp data successful!", "delete emp data fail!", whereIs))
                                 }
                         }
                 )
         })  
+
+/****************************************************************
+ ******** MONGODB - MONGOOSE
+ *****************************************************************/
+
+        /* restrict admin */
+/* query accounts from db */
+mondb.route('/accounts')
+	.get((req, res) => {
+                let whereIs = req.originalUrl;
+                util.queryAccountFromDB()
+                .then(result => {
+                        res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));
+                })
+                .catch( (err)=>{
+                        res.json(util.resLog("error : " + err, 0, whereIs));
+                })
+        })
+
+	.post((req, res) => {
+                let whereIs = req.originalUrl;
+                let query = {emp_id : req.body.emp_id};
+		util.queryAccountFromDB(query)
+		.then(result => {
+                	res.json(util.resSolLog(result, "query accounts from database successful!", "fail to query!", whereIs));                
+		})
+		.catch( (err)=>{
+			res.json(util.resLog("error : " + err, 0, whereIs));
+		})
+	});
+
+/*
+ 
+DO NOT USE, DEV ONLY 
+ since address on chain should not be deletefrom db cuz  we can't find it back (or don't know how) so just find and update that account field to not active instead
+
+always execute success -> no return false or error 
+TODO: fix to use from module
+*/
+mondb.route('/cleardata')
+	.delete((req, res) => {
+		let whereIs = req.originalUrl;
+		User.remove({}, (err)=>{
+			if(err) res.json(util.resLog("error on clear data?", 0, whereIs, err));
+			res.json(util.resLog("clear data from database successful!", 1, whereIs));
+		})
+		/*
+		util.clearDataFromDB()
+		.then( ()=> {
+			res.json(util.resSolLog(result, "clear data from database successful!", "something went wrong on clearing data from database!", whereIs));
+		})
+		.catch( (err) => {
+			res.json(util.resLog("error on clear data?", 0, whereIs, err));
+		})
+		*/
+
+	})
+
+/* map each address from db to app layer  */
+mondb.route('/setup')
+        .get((req, res) => {
+                let whereIs = req.originalUrl;
+                User.find().stream()
+		.on('data', (doc) => {
+			var obj = { 	
+                                        address : doc.address,
+			    		pubkey : doc.pubkey,
+			    		prikey : doc.prikey
+				}
+			pipe.addAccountApp(obj);
+		})
+		.on('error', (err)=> {
+			res.json(util.resLog("error on setup accounts", 0, whereIs, err));
+		})
+		.on('end', () => {
+			res.json(util.resLog("executed!, please check manually", 1, whereIs));
+		}); 
+        });
+
+
+/* ------------------------- MORE FUNCTION -------------------------
+ *      - foreach addr in db -> clear  
+ *      - stocks should store in db too ?!?
+ *      - password separate from hr api
+ *      - insert update delete function
+ */
+
+/****************************************************************
+ ******** UTILITY / TEST SOME FUNCTION
+ *****************************************************************/
+/*
+utl.route('/uint')
+        .post((req ,res) => {
+                let whereIs = req.originalUrl;
+                myContract.uintToString(
+                        req.body.intx,
+                        {from : req.body.callerAddress},
+                        (error, res2) => {
+                                if(error) {
+                                        res.json(util.resLog(error.message, 0, whereIs));
+                                }else{
+                                        res.json(util.resSolLog(res2, "get uint!", "fail to get uint!", whereIs))
+                                }
+                        }
+                )
+        })
+*/
 /* PATTERN *//*   
 sol.route('/onspot')
         .post((req ,res) => {
@@ -405,8 +534,10 @@ sol.route('/onspot')
 app.use('/acc', account);       /* All account request prefix with "/acc" */
 app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
 app.use('/sol', sol);           /* All smart contract/solidity job prefix with "/sol" */
-app.use('/sol/stock',   stock); 
-app.use('/sol/emp',     emp) 
+app.use('/sol/stock', stock); 
+app.use('/sol/emp', emp); 
+/*app.use('/util', utl);*/
+app.use('/db', mondb);
 app.listen(port, (err) => {
         if (err) {
                 return console.log('Fail to intial server:', err);

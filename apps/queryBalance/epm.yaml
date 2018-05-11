@@ -2,11 +2,11 @@ jobs:
 
 - name: queryBalance
   query-account:
-      account: 326441B7D0FC68759343CE4ED2F0A86D31F9BFBB
+      account: DB06E1445BF33A2D7594CA8A12E810DC4E5634D7
       field: balance
 
 - name: queryNodeBalance
   query-account:
-      account: 0A37949103BDA9F2249BB3BFAF4D7F3D8421AEEE
+      account: 6FF146E4595006E06E3B840CDA11CACEFA999020
       field: balance
 

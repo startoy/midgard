@@ -138,6 +138,16 @@ DevPipe.prototype.addAccount = function (accountData) {
   return true
 }
 
+DevPipe.prototype.addAccountApp = function (accountData) {
+  console.log(accountData);
+  if (this._accountData.accounts[accountData.address]) {
+	return true
+  }
+  this._accountData.accounts[accountData.address] = accountData
+  return true
+}
+
+
 DevPipe.prototype.removeAccount = function (accountAddress) {
   var acc = this._accountData.accounts[accountAddress]
   if (!acc) {
