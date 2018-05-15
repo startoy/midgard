@@ -388,7 +388,7 @@ emp.route('/get')
                                 }
                         }
                 )
-        })  
+        }) 
 
         /* restrict admin */
 // clear the ticket to 0, what about onspot ?!? 
@@ -530,6 +530,34 @@ sol.route('/onspot')
                 )
         })
  */
+
+ // insert
+function addAccountToDB(emp_id, account, adminFlag) {
+        return new Promise( (fullfill, reject) => {
+                if(adminFlag){    
+                        let user = new User({
+                                emp_id : emp_id,
+                                address : account.address,
+                                pubkey : account.pubKey,
+                                prikey : account.priKey,
+                                active : true,
+                                admin : true
+                        });
+                }else{
+                        let user = new User({
+                                emp_id : emp_id,
+                                address : account.address,
+                                pubkey : account.pubKey,
+                                prikey : account.priKey,
+                                active : true
+                        });
+                }
+                user.save((err)=>{
+                        if (err) reject(err);
+                        return fulfill(true);
+                });
+        })
+}
 
 app.use('/acc', account);       /* All account request prefix with "/acc" */
 app.use('/tx',  tx);            /* All transaction request prefix with "/tx" */
