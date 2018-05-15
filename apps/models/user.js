@@ -9,6 +9,6 @@ module.exports = mongoose.model('User', new Schema({
 	pubkey : String,
 	prikey : String,
 	last_login : Date,
-	active : String,
+	active : Boolean,
 	admin : Boolean
 }));
