@@ -105,7 +105,7 @@ account.route('/generate')
                                 let newDataObj = {
                                         address: address,
                                         pubKey: pub,
-                                        priKey: pri
+                                        privKey: pri
                                 };
                                 res.json(newDataObj);
                         } else {
@@ -474,7 +474,7 @@ mondb.route('/setup')
 			var obj = { 	
                                         address : doc.address,
 			    		pubkey : doc.pubkey,
-			    		prikey : doc.prikey
+			    		privkey : doc.privkey
 				}
 			pipe.addAccountApp(obj);
 		})
@@ -539,7 +539,7 @@ function addAccountToDB(emp_id, account, adminFlag) {
                                 emp_id : emp_id,
                                 address : account.address,
                                 pubkey : account.pubKey,
-                                prikey : account.priKey,
+                                privkey : account.privKey,
                                 active : true,
                                 admin : true
                         });
@@ -548,7 +548,7 @@ function addAccountToDB(emp_id, account, adminFlag) {
                                 emp_id : emp_id,
                                 address : account.address,
                                 pubkey : account.pubKey,
-                                prikey : account.priKey,
+                                privkey : account.privKey,
                                 active : true
                         });
                 }

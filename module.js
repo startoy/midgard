@@ -89,7 +89,7 @@ exports.addAccountToDB = (emp_id, account, adminFlag) => {
                         emp_id : emp_id,
                         address : account.address,
                         pubkey : account.pubKey,
-                        prikey : account.priKey,
+                        privkey : account.privKey,
                         active : true,
                         admin : true
                 });
@@ -98,7 +98,7 @@ exports.addAccountToDB = (emp_id, account, adminFlag) => {
                         emp_id : emp_id,
                         address : account.address,
                         pubkey : account.pubKey,
-                        prikey : account.priKey,
+                        privkey : account.privKey,
                         active : true
                 });
             }  
