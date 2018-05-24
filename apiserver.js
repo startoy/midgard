@@ -53,6 +53,13 @@ var emp	    = express.Router();
 /*var utl     = express.Router();*/
 var mondb   = express.Router();
 
+
+app.use((req, res, next) =>  {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+ })
+
 /****************************************************************
  ******** ACCOUNT 
  *****************************************************************/
@@ -305,6 +312,8 @@ emp.route('/create')
 
 emp.route('/give')
         .post((req ,res) => {
+		console.log(req.body);
+		//console.log("%s %s %s",req.body.sender,JSON.stringify(req.body.reciever),req.body.description);
                 let whereIs = req.originalUrl;
                 myContract.give_onspot(
                         req.body.sender,
@@ -357,7 +366,6 @@ emp.route('/history')
                 )
         })
 
-/* FIXME: can't use this */
 emp.route('/empredeem')
         .post((req ,res) => {
                 let whereIs = req.originalUrl;

@@ -239,9 +239,11 @@ contract Onspot {
 		if(num==0) return "0";
 		var str = "";
 		var count = "";
+		uint i = 0;
 		bool isPass1Loop = false;
 		str = strConcat(str, "[ ");
-		for (uint i = 1; i <= num; i++) {
+		for (uint j = 0; j < num; j++) {
+			i = stock_list[j];
 			if (employees[_req].myStock[i].amount != 0) {
 				if(isPass1Loop) str = strConcat(str, ", ");
 				str = strConcat(str, "{");
@@ -267,9 +269,30 @@ contract Onspot {
 		return employees[_req].count_myStock.length;
 	}
 
-	function getEmployee(address _addr) constant returns(uint, string, uint, uint) {
-		return (employees[_addr].id, employees[_addr].name, employees[_addr].myWallet.onspot, employees[_addr].myWallet.ticket);
+	function getEmployee(address _addr) constant returns(string) {
+		var str = "[";
+		str = strConcat(str, "{");
+		str = strConcat(str, "\"id\" : ");
+		str = strConcat(str, uint2str(employees[_addr].id));
+		str = strConcat(str, ",");
+
+                str = strConcat(str, "\"name\" : \"");
+                str = strConcat(str, employees[_addr].name);
+		str = strConcat(str, "\",");
+
+                str = strConcat(str, "\"onspot\" : ");
+                str = strConcat(str, uint2str(employees[_addr].myWallet.onspot));
+		str = strConcat(str, ",");
+
+                str = strConcat(str, "\"ticket\" : ");
+                str = strConcat(str, uint2str(employees[_addr].myWallet.ticket));
+		str = strConcat(str, "}]");
+		return str;
 	}
+
+	/*function getEmployee(address _addr) constant returns(uint, string, uint, uint) {
+		return (employees[_addr].id, employees[_addr].name, employees[_addr].myWallet.onspot, employees[_addr].myWallet.ticket);
+	}*/
 
 	function countEmployees() public returns(uint) {
 		return emp_list.length;
